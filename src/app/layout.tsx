@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import AppSidebar from "@/components/app-sidebar"
 
 import "./globals.css";
+import SessionWrapper from "@/components/session-wrapper";
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
@@ -27,17 +28,19 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="dark"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <AppSidebar>{children}</AppSidebar>
-                </ThemeProvider>
-            </body>
-        </html>
+        <SessionWrapper>
+            <html lang="en">
+                <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="dark"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        <AppSidebar>{children}</AppSidebar>
+                    </ThemeProvider>
+                </body>
+            </html>
+        </SessionWrapper>
     );
 }

@@ -1,9 +1,9 @@
 "use client"
 
-
 import * as React from "react"
 import { useTheme } from "next-themes"
 import Image from "next/image"
+
 import {
   BadgeCheck,
   Bell,
@@ -64,6 +64,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { usePathname } from "next/navigation"
+import { SignIn } from "./auth/signin"
 
 export const iframeHeight = "800px"
 
@@ -344,6 +345,7 @@ export default function Page({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <LogOut />
+                    <SignIn />
                     Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>

@@ -5,12 +5,9 @@ import * as React from "react"
 import { useTheme } from "next-themes"
 import Image from "next/image"
 import {
-  AudioWaveform,
   BadgeCheck,
   Bell,
   ChevronsUpDown,
-  Command,
-  GalleryVerticalEnd,
   LogOut,
   House,
   School,
@@ -22,6 +19,7 @@ import {
   Sun,
   Check,
   Monitor,
+  LucideProps,
 } from "lucide-react"
 
 
@@ -35,7 +33,6 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import {
@@ -66,76 +63,74 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { usePathname } from "next/navigation"
 
 export const iframeHeight = "800px"
 
 export const description = "A sidebar that collapses to icons."
 
 // This is sample data.
-const data = {
+const data: {
+  user: {
+    name: string;
+    email: string;
+    avatar: string;
+  };
+  contents: {
+    [key: string]: {
+      name: string;
+      url: string;
+      icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
+    }[];
+  };
+} = {
   user: {
     name: "shadcn",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [
-    {
-      title: "Home",
-      url: "/",
-      icon: House,
-      //   isActive: true,
-    },
-    {
-      title: "Scholarships",
-      url: "/scholarships",
-      icon: School,
-    }
-  ],
-  student: [
-    {
-      name: "My applications",
-      url: "#",
-      icon: GraduationCap,
-    }
-  ],
-  promoter: [
-    {
-      name: "My proposals",
-      url: "#",
-      icon: FileUser,
-    }
-  ],
-  secretary: [
-    {
-      name: "Review proposals",
-      url: "#",
-      icon: Award,
-    }
-  ],
-  jury: [
-    {
-      name: "Review applications",
-      url: "#",
-      icon: UserCog,
-    }
-  ],
+  contents: {
+    navMain: [
+      {
+        name: "Home",
+        url: "/",
+        icon: House,
+      },
+      {
+        name: "Scholarships",
+        url: "/scholarships",
+        icon: School,
+      }
+    ],
+    student: [
+      {
+        name: "My applications",
+        url: "/applications",
+        icon: GraduationCap,
+      }
+    ],
+    promoter: [
+      {
+        name: "My proposals",
+        url: "/proposals",
+        icon: FileUser,
+      }
+    ],
+    secretary: [
+      {
+        name: "Review proposals",
+        url: "/secretary/proposals",
+        icon: Award,
+      }
+    ],
+    jury: [
+      {
+        name: "Review applications",
+        url: "/jury/applications",
+        icon: UserCog,
+      }
+    ]
+  }
 }
 
 export default function Page({
@@ -143,8 +138,9 @@ export default function Page({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const [activeTeam, setActiveTeam] = React.useState(data.teams[0])
   const { theme, setTheme } = useTheme()
+  const pathname = usePathname()
+  console.log(pathname);
 
   const getCurrentThemeIcon = () => {
     if (theme === "light") return <Sun className="size-4 mr-2" />
@@ -177,12 +173,12 @@ export default function Page({
           <SidebarGroup>
             {/* <SidebarGroupLabel>Platform</SidebarGroupLabel> */}
             <SidebarMenu>
-              {data.navMain.map((item) => (
-                <SidebarMenuItem key={item.title}>
+              {data.contents.navMain.map((item) => (
+                <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
                       <item.icon />
-                      <span>{item.title}</span>
+                      <span>{item.name}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -192,7 +188,7 @@ export default function Page({
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>Student</SidebarGroupLabel>
             <SidebarMenu>
-              {data.student.map((item) => (
+              {data.contents.student.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
@@ -207,7 +203,7 @@ export default function Page({
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>Promoter</SidebarGroupLabel>
             <SidebarMenu>
-              {data.promoter.map((item) => (
+              {data.contents.promoter.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
@@ -222,7 +218,7 @@ export default function Page({
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>Secretary</SidebarGroupLabel>
             <SidebarMenu>
-              {data.secretary.map((item) => (
+              {data.contents.secretary.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
@@ -237,7 +233,7 @@ export default function Page({
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>Jury</SidebarGroupLabel>
             <SidebarMenu>
-              {data.jury.map((item) => (
+              {data.contents.jury.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
@@ -365,15 +361,47 @@ export default function Page({
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
+                {
+                  pathname !== "/" && (
+                    <>
+                      <BreadcrumbItem className="hidden md:block">
+                        <BreadcrumbLink href="/">
+                          Home
+                        </BreadcrumbLink>
+                      </BreadcrumbItem>
+                      <BreadcrumbSeparator />
+                    </>
+                  )
+                }
+                {
+                  Object.keys(data.contents).map((key) => {
+                    const value = data.contents[key];
+                    const current = value.find((item) => item.url === pathname && pathname !== "/");
+                    if (current) {
+                      return (
+                        <>
+                          {
+                            key !== "navMain" && (
+                              <>
+                                <BreadcrumbItem className="hidden md:block">
+                                  <BreadcrumbLink>
+                                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                                  </BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                              </>
+                            )
+                          }
+                          <BreadcrumbItem className="hidden md:block" key={current.name}>
+                            <BreadcrumbLink href={current.url}>
+                              {current.name}
+                            </BreadcrumbLink>
+                          </BreadcrumbItem>
+                        </>
+                      )
+                    }
+                  })
+                }
               </BreadcrumbList>
             </Breadcrumb>
           </div>

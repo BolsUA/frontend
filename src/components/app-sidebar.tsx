@@ -140,7 +140,6 @@ export default function Page({
 }>) {
   const { theme, setTheme } = useTheme()
   const pathname = usePathname()
-  console.log(pathname);
 
   const getCurrentThemeIcon = () => {
     if (theme === "light") return <Sun className="size-4 mr-2" />

@@ -5,12 +5,13 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { IoCalendarClear } from "react-icons/io5";
+import { useEffect, useState } from "react";
 
 // Define the structure of a scholarship
 interface Scholarship {
   id: string
   name: string
-  scientificAreas: string[]
+  scientific_areas: { name: string, id: string }[]
   type: string
   deadline: string
   status: "Draft" | "Under Review" | "Open" | "Jury Evaluation" | "Closed"
@@ -58,53 +59,22 @@ const buttonColors = {
   "Closed": "bg-red-500/50 text-secondary-foreground hover:bg-secondary/80",
 };
 
-
-// Sample data (replace this with actual data from your backend)
-const scholarships: Scholarship[] = [
-  {
-    id: "1",
-    name: "STEM Excellence Scholarship",
-    scientificAreas: ["Engineering", "Computer Science", "Mathematics"],
-    type: "Full Tuition",
-    deadline: "1 day left",
-    status: "Draft",
-  },
-  {
-    id: "2",
-    name: "Global Health Research Grant",
-    scientificAreas: ["Medicine", "Public Health", "Biology"],
-    type: "Research Grant",
-    deadline: " 14-08-2024",
-    status: "Under Review",
-  },
-  {
-    id: "3",
-    name: "Environmental Studies Fellowship",
-    scientificAreas: ["Environmental Science", "Ecology", "Sustainability"],
-    type: "Fellowship",
-    deadline: "1 week left",
-    status: "Open",
-  },
-  {
-    id: "4",
-    name: "Arts and Humanities Scholarship",
-    scientificAreas: ["Literature", "History", "Philosophy"],
-    type: "Partial Tuition",
-    deadline: "2 months left",
-    status: "Jury Evaluation",
-  },
-  {
-    id: "5",
-    name: "Social Sciences Research Award",
-    scientificAreas: ["Psychology", "Sociology", "Anthropology"],
-    type: "Research Award",
-    deadline: "01-10-2024",
-    status: "Closed",
-  },
-]
-
-
 export default function ScholarshipsPage() {
+  const [scholarships, setScholarships] = useState<Scholarship[]>([]);
+
+  useEffect(() => {
+    const fetchScholarships = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/scholarships").then((res) => res.json());
+        setScholarships(response);
+      } catch (error) {
+        console.error("Error fetching scholarships:", error);
+      }
+    };
+  
+    fetchScholarships();
+  }, []);
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Available Scholarships</h1>
@@ -118,9 +88,9 @@ export default function ScholarshipsPage() {
                   <div className="mb-2">
                     {/* <span className="font-semibold">Scientific Areas:</span> */}
                     <div className="flex flex-wrap gap-1 mt-1 mb-2">
-                      {scholarship.scientificAreas.map((area) => (
-                        <Badge key={area} className={areaColors[area as keyof typeof areaColors] || areaColors["default"]}>
-                          {area}
+                      {scholarship.scientific_areas.map((area) => (
+                        <Badge key={area.name} className={areaColors[area.name as keyof typeof areaColors] || areaColors["default"]}>
+                          {area.name}
                         </Badge>
                       ))}
                     </div>

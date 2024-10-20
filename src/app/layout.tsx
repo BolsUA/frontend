@@ -18,8 +18,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-    title: "BolsUA",
-    description: "Scholarships"
+    title: "BolsUA - Scholarship Platform",
 };
 
 export default function RootLayout({

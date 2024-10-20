@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -14,7 +13,7 @@ interface Scholarship {
   scientificAreas: string[]
   type: string
   deadline: string
-  status: string
+  status: "Draft" | "Under Review" | "Open" | "Jury Evaluation" | "Closed"
 }
 
 const areaColors = {
@@ -51,6 +50,15 @@ const areaColors = {
   "default": "bg-gray-500/50 text-secondary-foreground hover:bg-secondary/80"
 };
 
+const buttonColors = {
+  "Draft": "bg-gray-500/50 text-secondary-foreground hover:bg-secondary/80",
+  "Under Review": "bg-yellow-500/50 text-secondary-foreground hover:bg-secondary/80",
+  "Open": "bg-green-500/50 text-secondary-foreground hover:bg-secondary/80",
+  "Jury Evaluation": "bg-blue-500/50 text-secondary-foreground hover:bg-secondary/80",
+  "Closed": "bg-red-500/50 text-secondary-foreground hover:bg-secondary/80",
+};
+
+
 // Sample data (replace this with actual data from your backend)
 const scholarships: Scholarship[] = [
   {
@@ -59,15 +67,15 @@ const scholarships: Scholarship[] = [
     scientificAreas: ["Engineering", "Computer Science", "Mathematics"],
     type: "Full Tuition",
     deadline: "1 day left",
-    status: "Open",
+    status: "Draft",
   },
   {
     id: "2",
     name: "Global Health Research Grant",
     scientificAreas: ["Medicine", "Public Health", "Biology"],
     type: "Research Grant",
-    deadline: " closed at 14-08-2024",
-    status: "Closed",
+    deadline: " 14-08-2024",
+    status: "Under Review",
   },
   {
     id: "3",
@@ -83,14 +91,14 @@ const scholarships: Scholarship[] = [
     scientificAreas: ["Literature", "History", "Philosophy"],
     type: "Partial Tuition",
     deadline: "2 months left",
-    status: "Open",
+    status: "Jury Evaluation",
   },
   {
     id: "5",
     name: "Social Sciences Research Award",
     scientificAreas: ["Psychology", "Sociology", "Anthropology"],
     type: "Research Award",
-    deadline: " closed at 01-10-2024",
+    deadline: "01-10-2024",
     status: "Closed",
   },
 ]
@@ -123,16 +131,7 @@ export default function ScholarshipsPage() {
                 </div>
                 <div className="flex flex-col items-start md:items-end">
                   <div className="mb-2">
-                    <Badge
-                      variant={
-                        scholarship.status === "Open"
-                          ? "success" // Change "success" to "default" or another accepted type
-                          : scholarship.status === "Closed"
-                            ? "destructive"
-                            : "default"
-                      }
-                      className="top-4 right-4 z-10"
-                    >
+                    <Badge className={`top-4 right-4 z-10 ${buttonColors[scholarship.status as keyof typeof buttonColors] || buttonColors["Draft"]}`}>
                       {scholarship.status}
                     </Badge>
                   </div>

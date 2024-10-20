@@ -2,23 +2,26 @@
 
 
 import * as React from "react"
+import { useTheme } from "next-themes"
+import Image from "next/image"
 import {
   AudioWaveform,
   BadgeCheck,
   Bell,
   ChevronsUpDown,
   Command,
-  CreditCard,
   GalleryVerticalEnd,
   LogOut,
-  Plus,
-  Sparkles,
   House,
   School,
   FileUser,
   GraduationCap,
   UserCog,
-  Award
+  Award,
+  Moon,
+  Sun,
+  Check,
+  Monitor,
 } from "lucide-react"
 
 
@@ -42,8 +45,10 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -95,7 +100,7 @@ const data = {
       title: "Home",
       url: "/",
       icon: House,
-    //   isActive: true,
+      //   isActive: true,
     },
     {
       title: "Scholarships",
@@ -134,11 +139,18 @@ const data = {
 }
 
 export default function Page({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-  const [activeTeam, setActiveTeam] = React.useState(data.teams[0])
+  // const [activeTeam, setActiveTeam] = React.useState(data.teams[0])
+  const { theme, setTheme } = useTheme()
+
+  const getCurrentThemeIcon = () => {
+    if (theme === "light") return <Sun className="size-4 mr-2" />
+    if (theme === "dark") return <Moon className="size-4 mr-2" />
+    return <Monitor className="size-4 mr-2" />
+  }
 
   return (
     <SidebarProvider>
@@ -146,59 +158,18 @@ export default function Page({
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton
-                    size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                  >
-                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                      <activeTeam.logo className="size-4" />
-                    </div>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
-                        {activeTeam.name}
-                      </span>
-                      <span className="truncate text-xs">
-                        {activeTeam.plan}
-                      </span>
-                    </div>
-                    <ChevronsUpDown className="ml-auto" />
-                  </SidebarMenuButton>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                  align="start"
-                  side="bottom"
-                  sideOffset={4}
-                >
-                  <DropdownMenuLabel className="text-xs text-muted-foreground">
-                    Teams
-                  </DropdownMenuLabel>
-                  {data.teams.map((team, index) => (
-                    <DropdownMenuItem
-                      key={team.name}
-                      onClick={() => setActiveTeam(team)}
-                      className="gap-2 p-2"
-                    >
-                      <div className="flex size-6 items-center justify-center rounded-sm border">
-                        <team.logo className="size-4 shrink-0" />
-                      </div>
-                      {team.name}
-                      <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  ))}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="gap-2 p-2">
-                    <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                      <Plus className="size-4" />
-                    </div>
-                    <div className="font-medium text-muted-foreground">
-                      Add team
-                    </div>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <SidebarMenuButton asChild>
+                <a href="/" className="group-data-[state=expanded]:flex group-data-[state=expanded]:items-center group-data-[state=expanded]:justify-center flex-shrink-0">
+                  <Image
+                    src="/BolsUA.png"
+                    alt="BolsUA Logo"
+                    width={32}
+                    height={32}
+                    className="h-8 w-8 rounded-lg object-contain flex-shrink-0"
+                  />
+                  <span className="text-lg font-semibold">BolsUA</span>
+                </a>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
@@ -208,16 +179,16 @@ export default function Page({
             <SidebarMenu>
               {data.navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
-                  <a href={item.url}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <a href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               ))}
             </SidebarMenu>
-          </SidebarGroup>   
+          </SidebarGroup>
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>Student</SidebarGroupLabel>
             <SidebarMenu>
@@ -336,24 +307,44 @@ export default function Page({
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
                     <DropdownMenuItem>
-                      <Sparkles />
-                      Upgrade to Pro
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem>
                       <BadgeCheck />
                       Account
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <CreditCard />
-                      Billing
                     </DropdownMenuItem>
                     <DropdownMenuItem>
                       <Bell />
                       Notifications
                     </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>
+                        <div className="flex items-center">
+                          {getCurrentThemeIcon()}
+                          <span>Theme</span>
+                        </div>
+                      </DropdownMenuSubTrigger>
+
+                      <DropdownMenuSubContent className="min-w-[150px]">
+                        <DropdownMenuItem onClick={() => setTheme("light")}>
+                          <Sun className="size-4" />
+                          Light Mode
+                          {theme === "light" && <Check className="ml-auto" />}
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem onClick={() => setTheme("dark")}>
+                          <Moon className="size-4" />
+                          Dark Mode
+                          {theme === "dark" && <Check className="ml-auto" />}
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem onClick={() => setTheme("system")}>
+                          <Monitor className="size-4" />
+                          System Default
+                          {theme === "system" && <Check className="ml-auto" />}
+                        </DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>

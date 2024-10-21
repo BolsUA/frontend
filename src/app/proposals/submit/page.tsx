@@ -208,7 +208,7 @@ export default function ScholarshipProposalForm() {
 
         return (
             <div className="container mx-auto p-4">
-                <h1 className="text-2xl font-bold mb-6">Scholarships Porposals</h1>
+                <h1 className="text-2xl font-bold mb-6">Scholarships Proposals</h1>
                 <Card className="w-full">
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">

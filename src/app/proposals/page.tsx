@@ -19,79 +19,79 @@ const buttonColors = {
 };
 
 const Proposals: Proposal[] = [
-  {
-    name: "STEM Excellence Scholarship",
-    type: "Full Tuition",
-    deadline: "1 day left",
-    status: "Draft",
-  },
-  {
-    name: "Global Health Research Grant",
-    type: "Research Grant",
-    deadline: "14-08-2024",
-    status: "Under Review",
-  },
-  {
-    name: "Environmental Studies Fellowship",
-    type: "Fellowship",
-    deadline: "1 week left",
-    status: "Open",
-  },
-  {
-    name: "Arts and Humanities Scholarship",
-    type: "Partial Tuition",
-    deadline: "2 months left",
-    status: "Jury Evaluation",
-  },
-  {
-    name: "Social Sciences Research Award",
-    type: "Research Award",
-    deadline: "01-10-2024",
-    status: "Closed",
-  },
-  {
-    name: "Innovative Technology Grant",
-    type: "Research Grant",
-    deadline: "15-09-2023",
-    status: "Open",
-  },
-  {
-    name: "Creative Arts Fellowship",
-    type: "Fellowship",
-    deadline: "30-11-2023",
-    status: "Under Review",
-  },
-  {
-    name: "Environmental Protection Scholarship",
-    type: "Partial Tuition",
-    deadline: "20-12-2023",
-    status: "Draft",
-  },
-  {
-    name: "Medical Research Award",
-    type: "Research Award",
-    deadline: "05-01-2024",
-    status: "Jury Evaluation",
-  },
-  {
-    name: "Global Education Scholarship",
-    type: "Full Tuition",
-    deadline: "10-02-2024",
-    status: "Closed",
-  },
+  // {
+  //   name: "STEM Excellence Scholarship",
+  //   type: "Full Tuition",
+  //   deadline: "1 day left",
+  //   status: "Draft",
+  // },
+  // {
+  //   name: "Global Health Research Grant",
+  //   type: "Research Grant",
+  //   deadline: "14-08-2024",
+  //   status: "Under Review",
+  // },
+  // {
+  //   name: "Environmental Studies Fellowship",
+  //   type: "Fellowship",
+  //   deadline: "1 week left",
+  //   status: "Open",
+  // },
+  // {
+  //   name: "Arts and Humanities Scholarship",
+  //   type: "Partial Tuition",
+  //   deadline: "2 months left",
+  //   status: "Jury Evaluation",
+  // },
+  // {
+  //   name: "Social Sciences Research Award",
+  //   type: "Research Award",
+  //   deadline: "01-10-2024",
+  //   status: "Closed",
+  // },
+  // {
+  //   name: "Innovative Technology Grant",
+  //   type: "Research Grant",
+  //   deadline: "15-09-2023",
+  //   status: "Open",
+  // },
+  // {
+  //   name: "Creative Arts Fellowship",
+  //   type: "Fellowship",
+  //   deadline: "30-11-2023",
+  //   status: "Under Review",
+  // },
+  // {
+  //   name: "Environmental Protection Scholarship",
+  //   type: "Partial Tuition",
+  //   deadline: "20-12-2023",
+  //   status: "Draft",
+  // },
+  // {
+  //   name: "Medical Research Award",
+  //   type: "Research Award",
+  //   deadline: "05-01-2024",
+  //   status: "Jury Evaluation",
+  // },
+  // {
+  //   name: "Global Education Scholarship",
+  //   type: "Full Tuition",
+  //   deadline: "10-02-2024",
+  //   status: "Closed",
+  // },
 ];
 
-export default async function PorposalsPage() {
+export default async function ProposalsPage() {
   return (
     <div className="container mx-auto p-4">
       <div className='flex justify-between items-center mb-6'>
-        <h1 className="text-2xl font-bold mb-6">Scholarships Porposals</h1>
+        <h1 className="text-2xl font-bold mb-6">Scholarships Proposals</h1>
         <Button variant="destructive" className="text-right bg-green-800  hover:bg-secondary/80" asChild>
-          <Link href="/proposals/submit">New Porposal</Link>
+          <Link href="/proposals/submit">New Proposal</Link>
         </Button>
       </div>
       <Table>
-        <TableCaption>A list of your scholarships porposals.</TableCaption>
+        <TableCaption>A list of your scholarships proposals.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">Name</TableHead>

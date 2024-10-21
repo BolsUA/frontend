@@ -59,12 +59,8 @@ export default function ScholarshipProposalForm() {
     const [hasTemplate, setHasTemplate] = useState(false);
 
     const [selectedTypes, setSelectedTypes] = useState<options[]>([]);
-    const handleChangeTypes = (newValue: MultiValue<options> | SingleValue<options>) => {
-        if (newValue === null) {
-            setSelectedTypes([]);
-        } else {
-            setSelectedTypes(newValue as options[]);
-        }
+    const handleChangeTypes = (newValue: SingleValue<options>) => {
+        setSelectedTypes(newValue ? [newValue as options] : []);
     };
 
     const [selectedAreas, setSelectedAreas] = useState<options[]>([]);

@@ -1,9 +1,9 @@
 "use client"
 
-
 import * as React from "react"
 import { useTheme } from "next-themes"
 import Image from "next/image"
+
 import {
   BadgeCheck,
   Bell,
@@ -20,6 +20,7 @@ import {
   Check,
   Monitor,
   LucideProps,
+  LogIn,
 } from "lucide-react"
 
 
@@ -64,6 +65,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { usePathname } from "next/navigation"
+import { signIn, signOut, useSession } from "next-auth/react"
 
 export const iframeHeight = "800px"
 
@@ -71,11 +73,6 @@ export const description = "A sidebar that collapses to icons."
 
 // This is sample data.
 const data: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
   contents: {
     [key: string]: {
       name: string;
@@ -84,11 +81,6 @@ const data: {
     }[];
   };
 } = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   contents: {
     navMain: [
       {
@@ -139,6 +131,7 @@ export default function Page({
   children: React.ReactNode;
 }>) {
   const { theme, setTheme } = useTheme()
+  const { data: session, status } = useSession()
   const pathname = usePathname()
 
   const getCurrentThemeIcon = () => {
@@ -246,110 +239,124 @@ export default function Page({
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton
-                    size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                  >
-                    <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage
-                        src={data.user.avatar}
-                        alt={data.user.name}
-                      />
-                      <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                    </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
-                        {data.user.name}
-                      </span>
-                      <span className="truncate text-xs">
-                        {data.user.email}
-                      </span>
-                    </div>
-                    <ChevronsUpDown className="ml-auto size-4" />
-                  </SidebarMenuButton>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                  side="bottom"
-                  align="end"
-                  sideOffset={4}
-                >
-                  <DropdownMenuLabel className="p-0 font-normal">
-                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                      <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarImage
-                          src={data.user.avatar}
-                          alt={data.user.name}
-                        />
-                        <AvatarFallback className="rounded-lg">
-                          CN
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">
-                          {data.user.name}
-                        </span>
-                        <span className="truncate text-xs">
-                          {data.user.email}
-                        </span>
-                      </div>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      <BadgeCheck />
-                      Account
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Bell />
-                      Notifications
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger>
-                        <div className="flex items-center">
-                          {getCurrentThemeIcon()}
-                          <span>Theme</span>
+          {
+            status === "authenticated" && session.user ? (
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuButton
+                        size="lg"
+                        className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                      >
+                        <Avatar className="h-8 w-8 rounded-lg">
+                          <AvatarImage
+                            src={session.user.image as string}
+                            alt={session.user.name as string}
+                          />
+                          <AvatarFallback className="rounded-lg">JD</AvatarFallback>
+                        </Avatar>
+                        <div className="grid flex-1 text-left text-sm leading-tight">
+                          <span className="truncate font-semibold">
+                            {session.user.name}
+                          </span>
+                          <span className="truncate text-xs">
+                            {session.user.email}
+                          </span>
                         </div>
-                      </DropdownMenuSubTrigger>
-
-                      <DropdownMenuSubContent className="min-w-[150px]">
-                        <DropdownMenuItem onClick={() => setTheme("light")}>
-                          <Sun className="size-4" />
-                          Light Mode
-                          {theme === "light" && <Check className="ml-auto" />}
+                        <ChevronsUpDown className="ml-auto size-4" />
+                      </SidebarMenuButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                      side="bottom"
+                      align="end"
+                      sideOffset={4}
+                    >
+                      <DropdownMenuLabel className="p-0 font-normal">
+                        <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                          <Avatar className="h-8 w-8 rounded-lg">
+                            <AvatarImage
+                              src={session.user.image as string}
+                              alt={session.user.name as string}
+                            />
+                            <AvatarFallback className="rounded-lg">
+                              JD
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="grid flex-1 text-left text-sm leading-tight">
+                            <span className="truncate font-semibold">
+                              {session.user.name}
+                            </span>
+                            <span className="truncate text-xs">
+                              {session.user.email}
+                            </span>
+                          </div>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                          <BadgeCheck />
+                          Account
                         </DropdownMenuItem>
-
-                        <DropdownMenuItem onClick={() => setTheme("dark")}>
-                          <Moon className="size-4" />
-                          Dark Mode
-                          {theme === "dark" && <Check className="ml-auto" />}
+                        <DropdownMenuItem>
+                          <Bell />
+                          Notifications
                         </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger>
+                            <div className="flex items-center">
+                              {getCurrentThemeIcon()}
+                              <span>Theme</span>
+                            </div>
+                          </DropdownMenuSubTrigger>
 
-                        <DropdownMenuItem onClick={() => setTheme("system")}>
-                          <Monitor className="size-4" />
-                          System Default
-                          {theme === "system" && <Check className="ml-auto" />}
-                        </DropdownMenuItem>
-                      </DropdownMenuSubContent>
-                    </DropdownMenuSub>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <LogOut />
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          </SidebarMenu>
+                          <DropdownMenuSubContent className="min-w-[150px]">
+                            <DropdownMenuItem onClick={() => setTheme("light")}>
+                              <Sun className="size-4" />
+                              Light Mode
+                              {theme === "light" && <Check className="ml-auto" />}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem onClick={() => setTheme("dark")}>
+                              <Moon className="size-4" />
+                              Dark Mode
+                              {theme === "dark" && <Check className="ml-auto" />}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem onClick={() => setTheme("system")}>
+                              <Monitor className="size-4" />
+                              System Default
+                              {theme === "system" && <Check className="ml-auto" />}
+                            </DropdownMenuItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onSelect={() => signOut()}>
+                        <LogOut />
+                        Log out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            ) : (
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton className="font-semibold" onClick={() => signIn("cognito")}>
+                    <LogIn />
+                    <span>Sign In</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            )
+          }
+
         </SidebarFooter>
         <SidebarRail />
       </Sidebar>

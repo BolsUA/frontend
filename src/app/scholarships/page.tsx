@@ -88,7 +88,14 @@ export default function ScholarshipsPage() {
                   <div className="mb-2">
                     {/* <span className="font-semibold">Scientific Areas:</span> */}
                     <div className="flex flex-wrap gap-1 mt-1 mb-2">
-                        {scholarship.scientific_areas.flatMap(area => JSON.parse(area.name).map((area: string) => area.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '))).map((area) => (
+                        {scholarship.scientific_areas.flatMap(area => {
+                          try {
+                            const names = JSON.parse(area.name).map((area: string) => area.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '))
+                            return names;
+                          } catch {
+                            return area.name
+                          }
+                        }).map((area) => (
                         <Badge key={area} className={areaColors[area as keyof typeof areaColors] || areaColors["default"]}>
                           {area}
                         </Badge>

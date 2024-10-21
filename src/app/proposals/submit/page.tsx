@@ -6,7 +6,44 @@ import { Textarea } from "@/components/ui/textarea"
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
+import { CheckCircle2 } from "lucide-react"
+import { AlertCircle } from "lucide-react"
 import Select, { MultiValue, SingleValue } from 'react-select';
+
+
+interface Document {
+    name: string;
+    hasTemplate: boolean;
+    template: File | null;
+}
+
+interface FormData {
+    name: string;
+    description: string;
+    scientificAreas: string[];
+    type: string;
+    desiredJury: string[];
+    spots: string;
+    requiredDocuments: Document[];
+    edict: File | null;
+}
+
+interface FormErrors {
+    [key: string]: string;
+}
+
+const initialFormData: FormData = {
+    name: '',
+    description: '',
+    scientificAreas: [],
+    type: '',
+    desiredJury: [],
+    spots: '',
+    requiredDocuments: [{ name: '', hasTemplate: false, template: null }],
+    edict: null,
+}
+
 
 const types = [
     { value: 'research-initiation', label: 'Research Initiation' },
@@ -17,28 +54,28 @@ const areas = [
     { value: 'physics', label: 'Physics' },
     { value: 'chemistry', label: 'Chemistry' },
     { value: 'mathematics', label: 'Mathematics' },
-  
+
     // Life Sciences
     { value: 'biology', label: 'Biology' },
     { value: 'medicine', label: 'Medicine' },
     { value: 'public-health', label: 'Public Health' },
     { value: 'environmental-science', label: 'Environmental Science' },
     { value: 'ecology', label: 'Ecology' },
-  
+
     // Engineering and Technology
     { value: 'engineering', label: 'Engineering' },
     { value: 'computer-science', label: 'Computer Science' },
-  
+
     // Social Sciences
     { value: 'psychology', label: 'Psychology' },
     { value: 'sociology', label: 'Sociology' },
     { value: 'anthropology', label: 'Anthropology' },
-  
+
     // Humanities
     { value: 'literature', label: 'Literature' },
     { value: 'history', label: 'History' },
     { value: 'philosophy', label: 'Philosophy' },
-  
+
     // Sustainability
     { value: 'sustainability', label: 'Sustainability' },
 ];
@@ -61,24 +98,90 @@ export default function ScholarshipProposalForm() {
     const [selectedTypes, setSelectedTypes] = useState<options[]>([]);
     const handleChangeTypes = (newValue: SingleValue<options>) => {
         setSelectedTypes(newValue ? [newValue as options] : []);
+        setFormData(prev => ({ ...prev, type: newValue ? (newValue as options).value : '' }));
     };
 
     const [selectedAreas, setSelectedAreas] = useState<options[]>([]);
     const handleChangeAreas = (newValue: MultiValue<options>) => {
         setSelectedAreas(newValue as options[]);
+        setFormData(prev => ({ ...prev, scientificAreas: newValue.map((v) => v.value) }));
     };
 
     const [selectedJury, setSelectedJury] = useState<options[]>([]);
     const handleChangeJury = (newValue: MultiValue<options>) => {
         setSelectedJury(newValue as options[]);
+        setFormData(prev => ({ ...prev, desiredJury: newValue.map((v) => v.value) }));
     };
 
-    
+    const [formData, setFormData] = useState<FormData>(initialFormData)
+    const [errors, setErrors] = useState<FormErrors>({})
+    const [isSubmitted, setIsSubmitted] = useState(false)
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target
+        setFormData(prev => ({ ...prev, [name]: value }))
+    }
+
+    const handleDocumentChange = (index: number, field: keyof Document, value: string | boolean | File | null) => {
+        const updatedDocuments = [...formData.requiredDocuments]
+        updatedDocuments[index] = { ...updatedDocuments[index], [field]: value }
+        setFormData(prev => ({ ...prev, requiredDocuments: updatedDocuments }))
+    }
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            setFormData(prev => ({ ...prev, edict: file }))
+        }
+    }
+
+
+    const addDocument = () => {
+        setFormData(prev => ({
+            ...prev,
+            requiredDocuments: [...prev.requiredDocuments, { name: '', hasTemplate: false, template: null }]
+        }))
+    }
+
+    const validateForm = (): boolean => {
+        const newErrors: FormErrors = {}
+        if (!formData.name) newErrors.name = 'Scholarship name is required'
+        if (!formData.description) newErrors.description = 'Description is required'
+        if (formData.scientificAreas.length === 0) newErrors.scientificAreas = 'At least one scientific area is required'
+        if (!formData.type) newErrors.type = 'Scholarship type is required'
+        if (formData.desiredJury.length === 0) newErrors.desiredJury = 'At least one jury member is required'
+        if (!formData.spots) newErrors.spots = 'Number of spots is required'
+        if (formData.requiredDocuments.some(doc => !doc.name)) {
+            newErrors.requiredDocuments = 'All document names are required'
+        }
+        if (!formData.edict) newErrors.edict = 'Edict is required'
+        setErrors(newErrors)
+        return Object.keys(newErrors).length === 0
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // Handle form submission
+        if (validateForm()) {
+            console.log('Form submitted:', formData)
+            // Simulate API call
+            setTimeout(() => {
+                setIsSubmitted(true)
+            }, 1000)
+        }
     };
+
+    if (isSubmitted) {
+        return (
+            <Alert>
+                <CheckCircle2 className="h-4 w-4" />
+                <AlertTitle>Success</AlertTitle>
+                <AlertDescription>
+                    Your scholarship proposal has been submitted successfully and will be reviewed.
+                </AlertDescription>
+            </Alert>
+        )
+    }
 
     return (
         <div className="container mx-auto p-4">
@@ -89,55 +192,30 @@ export default function ScholarshipProposalForm() {
                         <div className="grid grid-cols-2 gap-4 mt-4">
                             <div>
                                 <Label htmlFor="name">Scholarship Name</Label>
-                                <Input id="name" name="name" />
+                                <Input id="name" name="name" value={formData.name} onChange={handleInputChange} className={errors.name ? 'border-red-500' : ''} />
+                                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                             </div>
 
                             <div>
                                 <Label htmlFor="type">Scholarship Type</Label>
-                                {/* 
-                                <Select name="type"> 
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="undergraduate">Undergraduate</SelectItem>
-                                        <SelectItem value="graduate">Graduate</SelectItem>
-                                        <SelectItem value="postdoctoral">Postdoctoral</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                */}
-
                                 <Select
                                     options={types}
                                     value={selectedTypes}
                                     onChange={handleChangeTypes}
                                     className="mb-4 text-black"
                                     placeholder="Select type"
-                                    required
                                 />
+                                {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
                             </div>
 
                             <div className="col-span-2">
                                 <Label htmlFor="description">Description</Label>
-                                <Textarea id="description" name="description" className="w-full h-72 max-h-screen" />
+                                <Textarea id="description" name="description" value={formData.description} onChange={handleInputChange} className={errors.description ? 'border-red-500' : 'w-full h-72 max-h-screen'} />
+                                {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
                             </div>
 
                             <div>
                                 <Label htmlFor="scientificAreas">Scientific Areas</Label>
-                                {/*  
-                                <Select name="scientificAreas">
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select scientific areas" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="computer-science">Computer Science</SelectItem>
-                                        <SelectItem value="biology">Biology</SelectItem>
-                                        <SelectItem value="physics">Physics</SelectItem>
-                                        <SelectItem value="chemistry">Chemistry</SelectItem>
-                                        <SelectItem value="mathematics">Mathematics</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                */}
                                 <Select
                                     options={areas}
                                     value={selectedAreas}
@@ -145,26 +223,12 @@ export default function ScholarshipProposalForm() {
                                     isMulti={true}
                                     className="mb-4 text-black"
                                     placeholder="Select scientific areas"
-                                    required
                                 />
+                                {errors.scientificAreas && <p className="text-red-500 text-sm mt-1">{errors.scientificAreas}</p>}
                             </div>
 
                             <div>
                                 <Label htmlFor="desiredJury">Desired Jury</Label>
-                                {/*  
-                                <Select name="desiredJury">
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select jury members" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="prof-smith">Prof. Smith</SelectItem>
-                                        <SelectItem value="dr-johnson">Dr. Johnson</SelectItem>
-                                        <SelectItem value="prof-williams">Prof. Williams</SelectItem>
-                                        <SelectItem value="dr-brown">Dr. Brown</SelectItem>
-                                        <SelectItem value="prof-jones">Prof. Jones</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                */}
                                 <Select
                                     options={jury}
                                     value={selectedJury}
@@ -172,36 +236,86 @@ export default function ScholarshipProposalForm() {
                                     isMulti={true}
                                     className="mb-4 text-black"
                                     placeholder="Types"
-                                    required
                                 />
+                                {errors.desiredJury && <p className="text-red-500 text-sm mt-1">{errors.desiredJury}</p>}
                             </div>
 
                             <div>
                                 <Label htmlFor="spots">Number of Spots Available</Label>
-                                <Input id="spots" name="spots" type="number" min="1" />
+                                <Input id="spots" name="spots" type="number" min="1" value={formData.spots} onChange={handleInputChange} className={errors.spots ? 'border-red-500' : ''} />
+                                {errors.spots && <p className="text-red-500 text-sm mt-1">{errors.spots}</p>}
                             </div>
                         </div>
 
                         <div>
                             <Label>Required Documents</Label>
-                            <div className="grid grid-cols-2 gap-4 mt-2">
-                                <Input placeholder="Document name" />
-                                <div className="flex items-center space-x-2">
-                                    <input type="checkbox" id="hasTemplate" className="w-4 h-4" checked={hasTemplate} onChange={(e) => setHasTemplate(e.target.checked)} />
-                                    <Label htmlFor="hasTemplate">Has Template</Label>
-                                    {hasTemplate && (
-                                        <Input id="doc" type="file" className="w-full mt-2" />
-                                    )}
-                                    <Button type="button" variant="outline" size="sm">
-                                        Add Required Document
-                                    </Button>
+                            {formData.requiredDocuments.map((doc, index) => (
+                                <div key={index} className="grid grid-cols-2 gap-4 mt-2 items-center">
+                                    <Input
+                                        placeholder="Document name"
+                                        value={doc.name}
+                                        onChange={(e) => handleDocumentChange(index, 'name', e.target.value)}
+                                        className={errors.requiredDocuments ? 'border-red-500' : ''}
+                                    />
+                                    <div className="flex items-center space-x-2">
+                                        <input
+                                            type="checkbox"
+                                            id={`hasTemplate-${index}`}
+                                            checked={doc.hasTemplate}
+                                            onChange={(e) => handleDocumentChange(index, 'hasTemplate', e.target.checked)}
+                                            className="w-4 h-4"
+                                        />
+                                        <Label htmlFor={`hasTemplate-${index}`}>Has Template</Label>
+                                        {doc.hasTemplate && (
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    const input = document.createElement('input')
+                                                    input.type = 'file'
+                                                    input.onchange = (e) => {
+                                                        const file = (e.target as HTMLInputElement).files?.[0]
+                                                        if (file) {
+                                                            handleDocumentChange(index, 'template', file)
+                                                        }
+                                                    }
+                                                    input.click()
+                                                }}
+                                            >
+                                                Upload Template
+                                            </Button>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="mt-4">
-                                <Label htmlFor="doc">Add Edict</Label>
-                                <Input id="doc" type="file" className="mt-2" />
-                            </div>
+                            ))}
+                            {errors.requiredDocuments && <p className="text-red-500 text-sm mt-1">{errors.requiredDocuments}</p>}
+                            <Button type="button" variant="outline" onClick={addDocument} className="mt-2">
+                                Add Document
+                            </Button>
                         </div>
+                        
+                        <div>
+                            <Label htmlFor="edict">Edict</Label>
+                            <input
+                                type="file"
+                                id="edict"
+                                name="edict"
+                                className="w-full"
+                                onChange={handleFileChange}
+                            />
+                            {errors.edict && <p className="text-red-500 text-sm mt-1">{errors.edict}</p>}
+                        </div>
+
+                        {Object.keys(errors).length > 0 && (
+                            <Alert variant="destructive">
+                                <AlertCircle className="h-4 w-4" />
+                                <AlertTitle>Error</AlertTitle>
+                                <AlertDescription>
+                                    Please correct the errors in the form before submitting.
+                                </AlertDescription>
+                            </Alert>
+                        )}
 
                         <Button type="submit" className="w-full">Submit Proposal</Button>
                     </form>

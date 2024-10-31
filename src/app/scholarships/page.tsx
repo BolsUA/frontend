@@ -3,9 +3,30 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { CalendarIcon, GraduationCapIcon, BookOpenIcon, BeakerIcon, TrophyIcon } from "lucide-react"
+import { useMemo } from 'react';
+import { Button } from "@/components/ui/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Separator } from "@/components/ui/separator"
+import { ChevronDown, Filter, SortDesc, X } from "lucide-react"
+import { format } from 'date-fns'
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 import { IoCalendarClear } from "react-icons/io5";
 import { useEffect, useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
 
 // Define the structure of a scholarship
 interface Scholarship {
@@ -15,6 +36,95 @@ interface Scholarship {
   type: string
   deadline: string
   status: "Draft" | "Under Review" | "Open" | "Jury Evaluation" | "Closed"
+  publisher: string
+}
+
+interface Filters {
+  types: string[]
+  scientific_areas: string[]
+  statuses: string[]
+  publishers: string[]
+  deadlines: string[]
+}
+
+const scholarshipsdummy: Scholarship[] = [
+  {
+    id: "1",
+    name: "AScholarship 1",
+    scientific_areas: [{ name: "Physics", id: "1" }, { name: "Chemistry", id: "2" }],
+    type: "Undergraduate",
+    deadline: "2023-10-01",
+    status: "Open",
+    publisher: "Scholarship Foundation A"
+  },
+  {
+    id: "2",
+    name: "BScholarship 2",
+    scientific_areas: [{ name: "Biology", id: "3" }, { name: "Medicine", id: "4" }],
+    type: "Postdoctoral",
+    deadline: "2022-10-01",
+    status: "Closed",
+    publisher: "University B"
+  },
+  {
+    id: "3",
+    name: "DScholarship 3",
+    scientific_areas: [{ name: "Engineering", id: "5" }, { name: "Computer Science", id: "6" }],
+    type: "Masters",
+    deadline: "2024-11-30",
+    status: "Draft",
+    publisher: "Organization C"
+  },
+  {
+    id: "4",
+    name: "CScholarship 4",
+    scientific_areas: [{ name: "Psychology", id: "7" }, { name: "Sociology", id: "8" }],
+    type: "PhD",
+    deadline: "2024-12-29",
+    status: "Under Review",
+    publisher: "Institute D"
+  },
+  {
+    id: "5",
+    name: "FScholarship 5",
+    scientific_areas: [{ name: "Literature", id: "9" }, { name: "History", id: "10" }],
+    type: "Undergraduate",
+    deadline: "2025-01-15",
+    status: "Jury Evaluation",
+    publisher: "Research Center E"
+  },
+  {
+    id: "6",
+    name: "EScholarship 6",
+    scientific_areas: [{ name: "Public Health", id: "11" }, { name: "Environmental Science", id: "12" }],
+    type: "Postdoctoral",
+    deadline: "2024-12-31",
+    status: "Open",
+    publisher: "Scholarship Foundation A"
+  },
+  {
+    id: "7",
+    name: "Scholarship 7",
+    scientific_areas: [{ name: "Engineering", id: "13" }, { name: "Computer Science", id: "14" }],
+    type: "Masters",
+    deadline: "2022-10-01",
+    status: "Draft",
+    publisher: "Organization C"
+  },
+]
+
+const filtersdummy = {
+  types: ["Undergraduate", "Masters", "PhD", "Postdoctoral"],
+  scientific_areas: ["Computer Science", "Biology", "Physics", "Mathematics", "Chemistry", "Engineering"],
+  statuses: ["Open", "Closed", "Upcoming", "Draft", "Under Review", "Jury Evaluation"],
+  publishers: ["Scholarship Foundation A", "University B", "Organization C", "Institute D", "Research Center E"],
+  deadlines: [
+      "2024-12-31",
+      "2025-01-15",
+      "2025-03-01",
+      "2025-06-30",
+      "2025-09-15"
+  ]
 }
 
 const areaColors = {
@@ -61,26 +171,185 @@ const buttonColors = {
 
 export default function ScholarshipsPage() {
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
+  const [filters, setFilters] = useState({} as Filters);
+  const [activeFilters, setActiveFilters] = useState<Partial<Record<keyof Filters, string[]>>>({})
+
+  type DateRange = { from: Date; to?: Date };
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+
+  const [sortOrder, setSortOrder] = useState<string | null>(null); // Manage the sort order state
+
 
   useEffect(() => {
     const fetchScholarships = async () => {
-      try {
+      /*try {
         const response = await fetch("http://localhost:8000/scholarships").then((res) => res.json());
         setScholarships(response);
       } catch (error) {
         console.error("Error fetching scholarships:", error);
-      }
+      }*/
+      setScholarships(scholarshipsdummy);
     };
   
     fetchScholarships();
   }, []);
 
+  useEffect(() => {
+    const filteredScholarships = async () => {
+      /*try{
+        const response = await fetch("http://localhost:8000/scholarships/filters").then((res) => res.json());
+        setFilters(response);
+      } catch (error) {
+        console.error("Error filtering scholarships:", error); 
+      }*/
+      setFilters(filtersdummy); // Delete this line when working with the backend
+      
+    }
+    filteredScholarships();
+  }, []);
+
+  const handleFilterChange = (filterType: keyof Filters, value: string | null) => {
+    /*setActiveFilters((prev) => {
+      
+    });*/
+  };
+
+
+  // Set sorting criteria when onOrderChange is called
+  const onOrderChange = (value: string) => {
+    setSortOrder(value);
+  };
+
+  // Filter and sort scholarships using useMemo to optimize rendering
+  const filteredAndSortedScholarships = useMemo(() => {
+    
+    let result = scholarships;
+    return result;
+    
+  }, [scholarships, activeFilters, dateRange, sortOrder]);
+
+  const renderFilterPopover = (title: string, filterType: keyof Filters) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="h-9 border-dashed">
+          {title}
+          <ChevronDown className="ml-2 h-4 w-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <ScrollArea className="h-72 w-full">
+          {filters[filterType]?.map((item) => (
+            <div key={item} className="flex items-center space-x-2 mb-2">
+              <Checkbox
+                id={`${filterType}-${item}`}
+                checked={(activeFilters[filterType] || []).includes(item)}
+                onCheckedChange={() => handleFilterChange(filterType, item)}
+              />
+              <Label htmlFor={`${filterType}-${item}`}>{item}</Label>
+            </div>
+          ))}
+        </ScrollArea>
+      </PopoverContent>
+    </Popover>
+  )
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Available Scholarships</h1>
+      <Card className="mb-6">
+        <CardContent className="p-4">
+          <div className="flex items-center space-x-4 mb-4">
+            <Filter className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold">Filters</h2>
+            <Separator orientation="vertical" className="h-6" />
+            {renderFilterPopover('Types', 'types')}
+            {renderFilterPopover('Scientific Areas', 'scientific_areas')}
+            {renderFilterPopover('Statuses', 'statuses')}
+            {renderFilterPopover('Publishers', 'publishers')}
+            <Button
+              variant="outline"
+              className="h-9 border-dashed"
+              onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+            >
+              Deadlines
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+            <Separator orientation="vertical" className="h-6" />
+            <SortDesc className="h-5 w-5 text-muted-foreground" />
+            <Select onValueChange={onOrderChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Order by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="deadline_asc">Deadline (Ascending)</SelectItem>
+                <SelectItem value="deadline_desc">Deadline (Descending)</SelectItem>
+                <SelectItem value="name_asc">Name (A-Z)</SelectItem>
+                <SelectItem value="name_desc">Name (Z-A)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {Object.entries(activeFilters).flatMap(([filterType, values]) => {
+              if (filterType === 'deadlines' && values) {
+                const [start, end] = (values as unknown as [Date, Date]) || [null, null];
+                return [
+                  <Badge
+                    key={`${filterType}-range`}
+                    variant="secondary"
+                    className="cursor-pointer"
+                    onClick={() => handleFilterChange('deadlines', null)}
+                  >
+                    {`${format(start, 'MMM d, yyyy')} - ${format(end, 'MMM d, yyyy')}`}
+                    <X className="ml-1 h-3 w-3" />
+                  </Badge>
+                ]
+              }
+              return (values as string[]).map((value) => (
+                <Badge
+                  key={`${filterType}-${value}`}
+                  variant="secondary"
+                  className="cursor-pointer"
+                  onClick={() => handleFilterChange(filterType as keyof Filters, value)}
+                >
+                  {value}
+                  <X className="ml-1 h-3 w-3" />
+                </Badge>
+              ))
+            })}
+          </div>
+          {isCalendarOpen && (
+          <div className="flex justify-center mt-4">
+            <Calendar
+              initialFocus
+              mode="range"
+              selected={dateRange}
+              onSelect={(range) => {
+                if (range?.from && range?.to) {
+                  setDateRange({ from: range.from, to: range.to });
+                  setIsCalendarOpen(false); // Close the calendar after selection
+              
+                  // Update activeFilters with the selected date range
+                  handleFilterChange('deadlines', `${format(range.from, "yyyy-MM-dd")} - ${format(range.to, "yyyy-MM-dd")}`);
+                } else if (range?.from && !range?.to) {
+                  setDateRange({ from: range.from, to: undefined });
+                } else {
+                  setDateRange(undefined);
+                }
+              }}
+              
+              numberOfMonths={2}
+              className="rounded-md border"
+            />
+          </div>
+        )}
+        </CardContent>
+      </Card>
+      
       <ScrollArea className="h-[calc(100vh-16rem)]">
         <div className="space-y-4">
-          {scholarships.map((scholarship) => (
+          {filteredAndSortedScholarships.map(scholarship => (
             <Card key={scholarship.id}>
               <CardContent className="flex flex-col md:flex-row justify-between items-start md:items-center p-6">
                 <div className="flex-grow mb-4 md:mb-0 md:mr-4">

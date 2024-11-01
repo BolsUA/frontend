@@ -3,8 +3,6 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { CalendarIcon, GraduationCapIcon, BookOpenIcon, BeakerIcon, TrophyIcon } from "lucide-react"
-import { useMemo } from 'react';
 import { Button } from "@/components/ui/button"
 import {
   Popover,
@@ -42,89 +40,8 @@ interface Scholarship {
 interface Filters {
   types: string[]
   scientific_areas: string[]
-  statuses: string[]
-  publishers: string[]
+  status: string[]
   deadlines: string[]
-}
-
-const scholarshipsdummy: Scholarship[] = [
-  {
-    id: "1",
-    name: "AScholarship 1",
-    scientific_areas: [{ name: "Physics", id: "1" }, { name: "Chemistry", id: "2" }],
-    type: "Undergraduate",
-    deadline: "2023-10-01",
-    status: "Open",
-    publisher: "Scholarship Foundation A"
-  },
-  {
-    id: "2",
-    name: "BScholarship 2",
-    scientific_areas: [{ name: "Biology", id: "3" }, { name: "Medicine", id: "4" }],
-    type: "Postdoctoral",
-    deadline: "2022-10-01",
-    status: "Closed",
-    publisher: "University B"
-  },
-  {
-    id: "3",
-    name: "DScholarship 3",
-    scientific_areas: [{ name: "Engineering", id: "5" }, { name: "Computer Science", id: "6" }],
-    type: "Masters",
-    deadline: "2024-11-30",
-    status: "Draft",
-    publisher: "Organization C"
-  },
-  {
-    id: "4",
-    name: "CScholarship 4",
-    scientific_areas: [{ name: "Psychology", id: "7" }, { name: "Sociology", id: "8" }],
-    type: "PhD",
-    deadline: "2024-12-29",
-    status: "Under Review",
-    publisher: "Institute D"
-  },
-  {
-    id: "5",
-    name: "FScholarship 5",
-    scientific_areas: [{ name: "Literature", id: "9" }, { name: "History", id: "10" }],
-    type: "Undergraduate",
-    deadline: "2025-01-15",
-    status: "Jury Evaluation",
-    publisher: "Research Center E"
-  },
-  {
-    id: "6",
-    name: "EScholarship 6",
-    scientific_areas: [{ name: "Public Health", id: "11" }, { name: "Environmental Science", id: "12" }],
-    type: "Postdoctoral",
-    deadline: "2024-12-31",
-    status: "Open",
-    publisher: "Scholarship Foundation A"
-  },
-  {
-    id: "7",
-    name: "Scholarship 7",
-    scientific_areas: [{ name: "Engineering", id: "13" }, { name: "Computer Science", id: "14" }],
-    type: "Masters",
-    deadline: "2022-10-01",
-    status: "Draft",
-    publisher: "Organization C"
-  },
-]
-
-const filtersdummy = {
-  types: ["Undergraduate", "Masters", "PhD", "Postdoctoral"],
-  scientific_areas: ["Computer Science", "Biology", "Physics", "Mathematics", "Chemistry", "Engineering"],
-  statuses: ["Open", "Closed", "Upcoming", "Draft", "Under Review", "Jury Evaluation"],
-  publishers: ["Scholarship Foundation A", "University B", "Organization C", "Institute D", "Research Center E"],
-  deadlines: [
-      "2024-12-31",
-      "2025-01-15",
-      "2025-03-01",
-      "2025-06-30",
-      "2025-09-15"
-  ]
 }
 
 const areaColors = {
@@ -184,51 +101,82 @@ export default function ScholarshipsPage() {
 
   useEffect(() => {
     const fetchScholarships = async () => {
-      /*try {
-        const response = await fetch("http://localhost:8000/scholarships").then((res) => res.json());
-        setScholarships(response);
-      } catch (error) {
-        console.error("Error fetching scholarships:", error);
-      }*/
-      setScholarships(scholarshipsdummy);
+      const queryParams = new URLSearchParams();
+
+      for (const [filterType, values] of Object.entries(activeFilters)) {
+        if (!values || !values.length) continue;
+
+        if (filterType === 'deadlines') {
+          const [from, to] = values as string[];
+          queryParams.append('deadline_start', from);
+          queryParams.append('deadline_end', to);
+          continue;
+        }
+        // queryParams.append(filterType, values.join(','));
+
+        for (const value of values) queryParams.append(filterType, value);
+      }
+
+      const response = await fetch(`http://localhost:8000/scholarships?${queryParams.toString()}`)
+        .then((res) => res.json())
+        .catch(() => []);
+
+      if (sortOrder) {
+        response.sort((a: Scholarship, b: Scholarship) => {
+          if (sortOrder === 'deadline_asc') {
+            return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+          } else if (sortOrder === 'deadline_desc') {
+            return new Date(b.deadline).getTime() - new Date(a.deadline).getTime();
+          } else if (sortOrder === 'name_asc') {
+            return a.name.localeCompare(b.name);
+          } else if (sortOrder === 'name_desc') {
+            return b.name.localeCompare(a.name);
+          }
+          return 0;
+        });
+      }
+
+      setScholarships(response);
     };
-  
+
     fetchScholarships();
-  }, []);
+  }, [activeFilters, sortOrder]);
 
   useEffect(() => {
     const filteredScholarships = async () => {
-      /*try{
-        const response = await fetch("http://localhost:8000/scholarships/filters").then((res) => res.json());
-        setFilters(response);
-      } catch (error) {
-        console.error("Error filtering scholarships:", error); 
-      }*/
-      setFilters(filtersdummy); // Delete this line when working with the backend
-      
+      const response = await fetch("http://localhost:8000/scholarships/filters")
+        .then((res) => res.json())
+        .catch(() => []);
+      setFilters(response);
     }
     filteredScholarships();
   }, []);
 
   const handleFilterChange = (filterType: keyof Filters, value: string | null) => {
-    /*setActiveFilters((prev) => {
-      
-    });*/
+    setActiveFilters((prev) => {
+      const updatedFilters = { ...prev };
+      const currentValues = new Set(updatedFilters[filterType] || []);
+
+      if (value === null) {
+        delete updatedFilters[filterType];
+        if (filterType === 'deadlines') setDateRange(undefined);
+      } else if (value.includes(" - ")) {
+        // If value is a date range string, handle it accordingly
+        const dates = value.split(" - ");
+        const from = new Date(dates[0]);
+        const to = new Date(dates[1]);
+        updatedFilters[filterType] = [
+          from.toISOString().split('T')[0], 
+          to.toISOString().split('T')[0]
+        ];
+      } else {
+        if (currentValues.has(value)) currentValues.delete(value);
+        else currentValues.add(value);
+        updatedFilters[filterType] = Array.from(currentValues);
+      }
+      return updatedFilters;
+    });
   };
-
-
-  // Set sorting criteria when onOrderChange is called
-  const onOrderChange = (value: string) => {
-    setSortOrder(value);
-  };
-
-  // Filter and sort scholarships using useMemo to optimize rendering
-  const filteredAndSortedScholarships = useMemo(() => {
-    
-    let result = scholarships;
-    return result;
-    
-  }, [scholarships, activeFilters, dateRange, sortOrder]);
 
   const renderFilterPopover = (title: string, filterType: keyof Filters) => (
     <Popover>
@@ -266,8 +214,7 @@ export default function ScholarshipsPage() {
             <Separator orientation="vertical" className="h-6" />
             {renderFilterPopover('Types', 'types')}
             {renderFilterPopover('Scientific Areas', 'scientific_areas')}
-            {renderFilterPopover('Statuses', 'statuses')}
-            {renderFilterPopover('Publishers', 'publishers')}
+            {renderFilterPopover('Status', 'status')}
             <Button
               variant="outline"
               className="h-9 border-dashed"
@@ -278,7 +225,7 @@ export default function ScholarshipsPage() {
             </Button>
             <Separator orientation="vertical" className="h-6" />
             <SortDesc className="h-5 w-5 text-muted-foreground" />
-            <Select onValueChange={onOrderChange}>
+            <Select onValueChange={(value) => setSortOrder(value)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Order by" />
               </SelectTrigger>
@@ -320,36 +267,36 @@ export default function ScholarshipsPage() {
             })}
           </div>
           {isCalendarOpen && (
-          <div className="flex justify-center mt-4">
-            <Calendar
-              initialFocus
-              mode="range"
-              selected={dateRange}
-              onSelect={(range) => {
-                if (range?.from && range?.to) {
-                  setDateRange({ from: range.from, to: range.to });
-                  setIsCalendarOpen(false); // Close the calendar after selection
-              
-                  // Update activeFilters with the selected date range
-                  handleFilterChange('deadlines', `${format(range.from, "yyyy-MM-dd")} - ${format(range.to, "yyyy-MM-dd")}`);
-                } else if (range?.from && !range?.to) {
-                  setDateRange({ from: range.from, to: undefined });
-                } else {
-                  setDateRange(undefined);
-                }
-              }}
-              
-              numberOfMonths={2}
-              className="rounded-md border"
-            />
-          </div>
-        )}
+            <div className="flex justify-center mt-4">
+              <Calendar
+                initialFocus
+                mode="range"
+                selected={dateRange}
+                onSelect={(range) => {
+                  if (range?.from && range?.to) {
+                    setDateRange({ from: range.from, to: range.to });
+                    setIsCalendarOpen(false); // Close the calendar after selection
+
+                    // Update activeFilters with the selected date range
+                    handleFilterChange('deadlines', `${format(range.from, "yyyy-MM-dd")} - ${format(range.to, "yyyy-MM-dd")}`);
+                  } else if (range?.from && !range?.to) {
+                    setDateRange({ from: range.from, to: undefined });
+                  } else {
+                    setDateRange(undefined);
+                  }
+                }}
+
+                numberOfMonths={2}
+                className="rounded-md border"
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
-      
+
       <ScrollArea className="h-[calc(100vh-16rem)]">
         <div className="space-y-4">
-          {filteredAndSortedScholarships.map(scholarship => (
+          {scholarships.map(scholarship => (
             <Card key={scholarship.id}>
               <CardContent className="flex flex-col md:flex-row justify-between items-start md:items-center p-6">
                 <div className="flex-grow mb-4 md:mb-0 md:mr-4">
@@ -357,21 +304,21 @@ export default function ScholarshipsPage() {
                   <div className="mb-2">
                     {/* <span className="font-semibold">Scientific Areas:</span> */}
                     <div className="flex flex-wrap gap-1 mt-1 mb-2">
-                        {scholarship.scientific_areas.flatMap(area => {
-                          try {
-                            const names = JSON.parse(area.name).map((area: string) => area.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '))
-                            return names;
-                          } catch {
-                            return area.name
-                          }
-                        }).map((area) => (
+                      {scholarship.scientific_areas.flatMap(area => {
+                        try {
+                          const names = JSON.parse(area.name).map((area: string) => area.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '))
+                          return names;
+                        } catch {
+                          return area.name
+                        }
+                      }).map((area) => (
                         <Badge key={area} className={areaColors[area as keyof typeof areaColors] || areaColors["default"]}>
                           {area}
                         </Badge>
-                        ))}
+                      ))}
                     </div>
                     <div className="mb-2">
-                        <span className="font-semibold">Type:</span> {scholarship.type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                      <span className="font-semibold">Type:</span> {scholarship.type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                     </div>
                   </div>
                 </div>
@@ -382,7 +329,7 @@ export default function ScholarshipsPage() {
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <IoCalendarClear className="w-4 h-4"/>
+                    <IoCalendarClear className="w-4 h-4" />
                     <span> {scholarship.deadline} </span>
                   </div>
                 </div>

@@ -176,14 +176,21 @@ export default function ScholarshipProposalForm() {
             formDataToSubmit.append("publisher", session!.user!.name || 'Unknown');
             formDataToSubmit.append("type", formData.type);
             formDataToSubmit.append("deadline", formData.deadline);
-            formDataToSubmit.append("jury", formData.desiredJury[0]);
+            formDataToSubmit.append("jury", "1");
             formDataToSubmit.append("status", "Open");
-            formDataToSubmit.append("scientific_areas", JSON.stringify(formData.scientificAreas));
+            // formDataToSubmit.append("scientific_areas", JSON.stringify(formData.scientificAreas));
+            formData.scientificAreas.forEach((area) => formDataToSubmit.append("scientific_areas", area));
 
             // Append the file if present
             if (formData.edict) {
                 formDataToSubmit.append("edict_file", formData.edict);
             }
+
+            formData.requiredDocuments.forEach((doc) => {
+                if (doc.hasTemplate && doc.template) formDataToSubmit.append('document_file', doc.template);
+                formDataToSubmit.append('document_template', doc.hasTemplate.toString());
+                formDataToSubmit.append('document_required', "true");
+            });
 
             await fetch("http://localhost:8000/proposals", {
                 method: "POST",

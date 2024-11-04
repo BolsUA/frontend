@@ -134,6 +134,8 @@ export default function Page({
   const { data: session, status } = useSession()
   const pathname = usePathname()
 
+  if (session) console.log(session.user)
+
   const getCurrentThemeIcon = () => {
     if (theme === "light") return <Sun className="size-4 mr-2" />
     if (theme === "dark") return <Moon className="size-4 mr-2" />
@@ -192,51 +194,63 @@ export default function Page({
               ))}
             </SidebarMenu>
           </SidebarGroup>
-          <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-            <SidebarGroupLabel>Promoter</SidebarGroupLabel>
-            <SidebarMenu>
-              {data.contents.promoter.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.name}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
-          <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-            <SidebarGroupLabel>Secretary</SidebarGroupLabel>
-            <SidebarMenu>
-              {data.contents.secretary.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.name}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
-          <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-            <SidebarGroupLabel>Jury</SidebarGroupLabel>
-            <SidebarMenu>
-              {data.contents.jury.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.name}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
+          {
+            // @ts-expect-error groups is not defined in the default user type
+            session && session?.user?.groups?.includes("proposers") && (
+              <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+                <SidebarGroupLabel>Promoter</SidebarGroupLabel>
+                <SidebarMenu>
+                  {data.contents.promoter.map((item) => (
+                    <SidebarMenuItem key={item.name}>
+                      <SidebarMenuButton asChild>
+                        <a href={item.url}>
+                          <item.icon />
+                          <span>{item.name}</span>
+                        </a>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroup>
+            )}
+          {
+            // @ts-expect-error groups is not defined in the default user type
+            session && session?.user?.groups?.includes("secretary") &&
+            <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+              <SidebarGroupLabel>Secretary</SidebarGroupLabel>
+              <SidebarMenu>
+                {data.contents.secretary.map((item) => (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton asChild>
+                      <a href={item.url}>
+                        <item.icon />
+                        <span>{item.name}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroup>
+          }
+          {
+            // @ts-expect-error groups is not defined in the default user type
+            session && session?.user?.groups?.includes("jury") &&
+            <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+              <SidebarGroupLabel>Jury</SidebarGroupLabel>
+              <SidebarMenu>
+                {data.contents.jury.map((item) => (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton asChild>
+                      <a href={item.url}>
+                        <item.icon />
+                        <span>{item.name}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroup>
+          }
         </SidebarContent>
         <SidebarFooter>
           {

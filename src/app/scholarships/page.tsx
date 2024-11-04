@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import Link from 'next/link';
 import { Button } from "@/components/ui/button"
 import {
   Popover,
@@ -296,8 +297,9 @@ export default function ScholarshipsPage() {
 
       <ScrollArea className="h-[calc(100vh-16rem)]">
         <div className="space-y-4">
-          {scholarships.map(scholarship => (
-            <Card key={scholarship.id}>
+          {scholarships.map((scholarship) => (
+            <Link key={scholarship.id} href={`/scholarships/${scholarship.id}`}>
+            <Card key={scholarship.id} className="hover:shadow-lg hover:bg-gray-600 transition-shadow duration-300">
               <CardContent className="flex flex-col md:flex-row justify-between items-start md:items-center p-6">
                 <div className="flex-grow mb-4 md:mb-0 md:mr-4">
                   <h2 className="text-xl font-semibold mb-2">{scholarship.name}</h2>
@@ -335,6 +337,7 @@ export default function ScholarshipsPage() {
                 </div>
               </CardContent>
             </Card>
+            </Link>
           ))}
         </div>
       </ScrollArea>

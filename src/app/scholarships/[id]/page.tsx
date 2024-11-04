@@ -134,7 +134,7 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
               </div>
               <div className="flex items-center">
                 <Calendar className="mr-2 h-4 w-4" />
-                <span>application deadline: {scholarship.deadline}</span>
+                <span>Application deadline: {scholarship.deadline}</span>
               </div>
               <div className="flex items-center">            
                 <MdOutlineSchool className="mr-2 h-4 w-4"/>
@@ -168,8 +168,8 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
                       <FileText className="mr-2 h-4 w-4" />
                       {documents.name}
                     </div>
-                    {documents.template && (
-                      <Button variant="outline" size="sm" >Download Template</Button>
+                    {documents.file_path && (
+                        <Button variant="outline" size="sm" onClick={() => window.open(`http://localhost:8000/${documents.file_path}`, '_blank')}>Download Template</Button>
                     )}
                   </li>
                 ))}

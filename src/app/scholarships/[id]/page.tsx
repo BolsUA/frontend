@@ -19,12 +19,12 @@ interface Scholarship {
   description: string
   publisher: string
   type: string
-  jury: string[]
+  jury: { name: string, id: string }[]
   deadline: string
   status: "Draft" | "Under Review" | "Open" | "Jury Evaluation" | "Closed"
   scientific_areas: { name: string, id: string }[]
-  documents: { name: string, hasTemplate: boolean }[]
-  edicts: { name: string, description: string, publication_date: string, id: string }
+  documents: { name: string, file_path:string, hasTemplate: boolean, required: boolean , template: boolean }[]
+  edict: { name: string, description: string, publication_date: string, id: string }
 }
 
 const areaColors = {
@@ -149,7 +149,9 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
               <ul className="list-disc list-inside">
                   <li className="flex items-center">
                     <User className="mr-2 h-4 w-4" />
-                    {scholarship.jury}
+                    {scholarship.jury.map((jury) => (
+                      <span key={jury.id}>{jury.name}</span>
+                    ))}
                   </li>
               </ul>
             </div>
@@ -166,8 +168,8 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
                       <FileText className="mr-2 h-4 w-4" />
                       {documents.name}
                     </div>
-                    {documents.hasTemplate && (
-                      <Button variant="outline" size="sm">Download Template</Button>
+                    {documents.template && (
+                      <Button variant="outline" size="sm" >Download Template</Button>
                     )}
                   </li>
                 ))}

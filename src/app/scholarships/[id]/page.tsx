@@ -169,7 +169,9 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
                       {documents.name}
                     </div>
                     {documents.file_path && (
-                        <Button variant="outline" size="sm" onClick={() => window.open(`http://localhost:8000/${documents.file_path}`, '_blank')}>Download Template</Button>
+                        <Link href={`http://localhost:8000/${documents.file_path}`} target="_blank">
+                          <Button variant="outline" size="sm">Download Template</Button>
+                        </Link>
                     )}
                   </li>
                 ))}

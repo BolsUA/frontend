@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { AlertCircle, CheckCircle2, Upload } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useSession } from "next-auth/react";
 
 interface Scholarship {
   id: string;
@@ -19,6 +20,7 @@ interface FormData {
 }
 
 export default function ApplyForScholarship({ params: { id } }: { params: { id: string } }) {
+  const { data: session } = useSession()
   const router = useRouter()
   const [formData, setFormData] = useState<FormData>({
     documents: {}
@@ -66,10 +68,34 @@ export default function ApplyForScholarship({ params: { id } }: { params: { id: 
     e.preventDefault()
     if (validateForm()) {
       setIsSubmitting(true)
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      setIsSubmitting(false)
-      setIsSubmitted(true)
+      const formDataToSubmit = new FormData();
+      formDataToSubmit.append('scholarship_id', scholarship?.id || '');
+      formDataToSubmit.append('name', scholarship?.name || '');
+      formDataToSubmit.append('user_id', session?.user?.id || '');
+
+      Object.keys(formData.documents).forEach((key) => {
+        if (formData.documents[key]) {
+          formDataToSubmit.append('document_file', formData.documents[key] as File);
+        }
+      });
+
+      try {
+        const response = await fetch('http://localhost:8001/applications', {
+          method: 'POST',
+          body: formDataToSubmit,
+        });
+
+        if (response.ok) {
+          setIsSubmitted(true);
+        } else {
+          const errorData = await response.json();
+          setErrors({ form: errorData.detail || 'An error occurred while submitting the form.' });
+        }
+      } catch (error) {
+        setErrors({ form: 'An error occurred while submitting the form.' });
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   }
 

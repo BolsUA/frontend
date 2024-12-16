@@ -64,7 +64,7 @@ const areaColors = {
 // This would typically come from your API or database
 async function getScholarship(id: string) {
   try {
-    const response = await fetch(`http://localhost:8000/scholarships/${id}/details` , {cache: "no-cache"}); 
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/${id}/details` , {cache: "no-cache"}); 
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
@@ -169,7 +169,7 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
                       {documents.name}
                     </div>
                     {documents.file_path && (
-                        <Link href={`http://localhost:8000/${documents.file_path}`} target="_blank">
+                        <Link href={`${process.env.NEXT_PUBLIC_API_URL}/scholarships/${documents.file_path}`} target="_blank">
                           <Button variant="outline" size="sm">Download Template</Button>
                         </Link>
                     )}

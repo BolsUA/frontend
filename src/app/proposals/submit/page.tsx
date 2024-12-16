@@ -192,7 +192,7 @@ export default function ScholarshipProposalForm() {
                 formDataToSubmit.append('document_required', "true");
             });
 
-            await fetch("http://localhost:8000/proposals", {
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/proposals`, {
                 method: "POST",
                 body: formDataToSubmit,
             });

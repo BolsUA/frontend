@@ -118,7 +118,7 @@ export default function ScholarshipsPage() {
         for (const value of values) queryParams.append(filterType, value);
       }
 
-      const response = await fetch(`http://localhost:8000/scholarships?${queryParams.toString()}`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/?${queryParams.toString()}`)
         .then((res) => res.json())
         .catch(() => []);
 
@@ -145,7 +145,7 @@ export default function ScholarshipsPage() {
 
   useEffect(() => {
     const filteredScholarships = async () => {
-      const response = await fetch("http://localhost:8000/scholarships/filters")
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/filters`)
         .then((res) => res.json())
         .catch(() => []);
       setFilters(response);

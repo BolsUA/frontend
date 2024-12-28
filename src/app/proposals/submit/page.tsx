@@ -209,7 +209,7 @@ export default function ScholarshipProposalForm() {
             const formDataToSubmit = new FormData();
             formDataToSubmit.append("name", formData.name);
             formDataToSubmit.append("description", formData.description);
-            formDataToSubmit.append("publisher", session!.user!.name || 'Unknown');
+            formDataToSubmit.append("publisher", session!.user!.id || 'Unknown');
             formDataToSubmit.append("type", formData.type);
             formDataToSubmit.append("deadline", formData.deadline);
             formDataToSubmit.append("status", "Open");

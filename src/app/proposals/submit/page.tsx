@@ -33,7 +33,7 @@ interface FormData {
     description: string;
     scientificAreas: string[];
     type: string;
-    desiredJury: string[];
+    desiredJury: { id: string; name: string }[];
     spots: string;
     requiredDocuments: Document[];
     edict: File | null;
@@ -139,7 +139,7 @@ export default function ScholarshipProposalForm() {
 
     const handleChangeType = (value: string) => {
         setSelectedType(value);
-        setFormData(prev => ({ ...prev, type: value }));
+        setFormData(prev => ({ ...prev, type: types.find(type => type.value === value)!.label }));
     };
 
     const handleChangeAreas = (value: string[]) => {
@@ -149,7 +149,8 @@ export default function ScholarshipProposalForm() {
 
     const handleChangeJury = (value: string[]) => {
         setSelectedJury(value);
-        setFormData(prev => ({ ...prev, desiredJury: value }));
+        const juryMembers = jury.filter(member => value.includes(member.value)).map(member => ({ id: member.value, name: member.label }));
+        setFormData(prev => ({ ...prev, desiredJury: juryMembers }));
     };
 
     const [formData, setFormData] = useState<FormData>(initialFormData)
@@ -211,8 +212,9 @@ export default function ScholarshipProposalForm() {
             formDataToSubmit.append("publisher", session!.user!.name || 'Unknown');
             formDataToSubmit.append("type", formData.type);
             formDataToSubmit.append("deadline", formData.deadline);
-            formDataToSubmit.append("jury", "1");
             formDataToSubmit.append("status", "Open");
+            formDataToSubmit.append("spots", formData.spots);
+            formData.desiredJury.forEach((jury) => formDataToSubmit.append("jury", JSON.stringify(jury)));
             formData.scientificAreas.forEach((area) => formDataToSubmit.append("scientific_areas", area));
 
             // Append the file if present
@@ -222,6 +224,7 @@ export default function ScholarshipProposalForm() {
 
             formData.requiredDocuments.forEach((doc) => {
                 if (doc.hasTemplate && doc.template) formDataToSubmit.append('document_file', doc.template);
+                formDataToSubmit.append('document_name', doc.name);
                 formDataToSubmit.append('document_template', doc.hasTemplate.toString());
                 formDataToSubmit.append('document_required', "true");
             });

@@ -26,7 +26,6 @@ import { IoCalendarClear } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { useSession } from "next-auth/react";
 
 // Define the structure of a scholarship
 interface Scholarship {
@@ -100,8 +99,6 @@ export default function ScholarshipsPage() {
 
   const [sortOrder, setSortOrder] = useState<string | null>(null); // Manage the sort order state
 
-  const { data: session } = useSession();
-
   useEffect(() => {
     const fetchScholarships = async () => {
       const queryParams = new URLSearchParams();
@@ -121,17 +118,9 @@ export default function ScholarshipsPage() {
       }
 
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/?${queryParams.toString()}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          // @ts-expect-error Access token is defined
-          'Authorization': `Bearer ${session?.accessToken}`
-        }
-      })
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/?${queryParams.toString()}`)
         .then((res) => res.json())
         .catch(() => []);
-
-      if ('detail' in response) return;
 
       if (sortOrder) {
         response.sort((a: Scholarship, b: Scholarship) => {
@@ -152,18 +141,11 @@ export default function ScholarshipsPage() {
     };
 
     fetchScholarships();
-  }, [activeFilters, sortOrder, session]);
+  }, [activeFilters, sortOrder]);
 
   useEffect(() => {
     const filteredScholarships = async () => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/filters`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            // @ts-expect-error Access token is defined
-            'Authorization': `Bearer ${session?.accessToken}`
-          }
-        })
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/filters`)
         .then((res) => res.json())
         .catch(() => []);
 
@@ -171,7 +153,7 @@ export default function ScholarshipsPage() {
       setFilters(response);
     }
     filteredScholarships();
-  }, [session]);
+  }, []);
 
   const handleFilterChange = (filterType: keyof Filters, value: string | null) => {
     setActiveFilters((prev) => {

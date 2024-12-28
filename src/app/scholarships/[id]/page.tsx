@@ -7,11 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Calendar, Users, FileText, User } from "lucide-react"
-import { describe } from 'node:test'
-import { description } from '@/components/app-sidebar'
 import Link from 'next/link'
 import { MdOutlineSchool } from "react-icons/md";
-import { verify } from 'crypto'
 
 interface Scholarship {
   id: string

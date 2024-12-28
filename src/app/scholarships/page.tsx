@@ -26,6 +26,7 @@ import { IoCalendarClear } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { useSession } from "next-auth/react";
 
 // Define the structure of a scholarship
 interface Scholarship {
@@ -99,6 +100,7 @@ export default function ScholarshipsPage() {
 
   const [sortOrder, setSortOrder] = useState<string | null>(null); // Manage the sort order state
 
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchScholarships = async () => {
@@ -118,9 +120,18 @@ export default function ScholarshipsPage() {
         for (const value of values) queryParams.append(filterType, value);
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/?${queryParams.toString()}`)
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/?${queryParams.toString()}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          // @ts-expect-error Access token is defined
+          'Authorization': `Bearer ${session?.accessToken}`
+        }
+      })
         .then((res) => res.json())
         .catch(() => []);
+
+      if ('detail' in response) return;
 
       if (sortOrder) {
         response.sort((a: Scholarship, b: Scholarship) => {
@@ -141,17 +152,26 @@ export default function ScholarshipsPage() {
     };
 
     fetchScholarships();
-  }, [activeFilters, sortOrder]);
+  }, [activeFilters, sortOrder, session]);
 
   useEffect(() => {
     const filteredScholarships = async () => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/filters`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/filters`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            // @ts-expect-error Access token is defined
+            'Authorization': `Bearer ${session?.accessToken}`
+          }
+        })
         .then((res) => res.json())
         .catch(() => []);
+
+      if ('detail' in response) return;
       setFilters(response);
     }
     filteredScholarships();
-  }, []);
+  }, [session]);
 
   const handleFilterChange = (filterType: keyof Filters, value: string | null) => {
     setActiveFilters((prev) => {
@@ -167,7 +187,7 @@ export default function ScholarshipsPage() {
         const from = new Date(dates[0]);
         const to = new Date(dates[1]);
         updatedFilters[filterType] = [
-          from.toISOString().split('T')[0], 
+          from.toISOString().split('T')[0],
           to.toISOString().split('T')[0]
         ];
       } else {
@@ -299,44 +319,44 @@ export default function ScholarshipsPage() {
         <div className="space-y-4">
           {scholarships.map((scholarship) => (
             <Link key={scholarship.id} href={`/scholarships/${scholarship.id}`}>
-            <Card key={scholarship.id} className="hover:shadow-lg hover:bg-gray-600 transition-shadow duration-300">
-              <CardContent className="flex flex-col md:flex-row justify-between items-start md:items-center p-6">
-                <div className="flex-grow mb-4 md:mb-0 md:mr-4">
-                  <h2 className="text-xl font-semibold mb-2">{scholarship.name}</h2>
-                  <div className="mb-2">
-                    {/* <span className="font-semibold">Scientific Areas:</span> */}
-                    <div className="flex flex-wrap gap-1 mt-1 mb-2">
-                      {scholarship.scientific_areas.flatMap(area => {
-                        try {
-                          const names = JSON.parse(area.name).map((area: string) => area.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '))
-                          return names;
-                        } catch {
-                          return area.name
-                        }
-                      }).map((area) => (
-                        <Badge key={area} className={areaColors[area as keyof typeof areaColors] || areaColors["default"]}>
-                          {area}
-                        </Badge>
-                      ))}
-                    </div>
+              <Card key={scholarship.id} className="hover:shadow-lg hover:bg-gray-600 transition-shadow duration-300">
+                <CardContent className="flex flex-col md:flex-row justify-between items-start md:items-center p-6">
+                  <div className="flex-grow mb-4 md:mb-0 md:mr-4">
+                    <h2 className="text-xl font-semibold mb-2">{scholarship.name}</h2>
                     <div className="mb-2">
-                      <span className="font-semibold">Type:</span> {scholarship.type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                      {/* <span className="font-semibold">Scientific Areas:</span> */}
+                      <div className="flex flex-wrap gap-1 mt-1 mb-2">
+                        {scholarship.scientific_areas.flatMap(area => {
+                          try {
+                            const names = JSON.parse(area.name).map((area: string) => area.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '))
+                            return names;
+                          } catch {
+                            return area.name
+                          }
+                        }).map((area) => (
+                          <Badge key={area} className={areaColors[area as keyof typeof areaColors] || areaColors["default"]}>
+                            {area}
+                          </Badge>
+                        ))}
+                      </div>
+                      <div className="mb-2">
+                        <span className="font-semibold">Type:</span> {scholarship.type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex flex-col items-start md:items-end">
-                  <div className="mb-2">
-                    <Badge className={`top-4 right-4 z-10 ${buttonColors[scholarship.status as keyof typeof buttonColors] || buttonColors["Draft"]}`}>
-                      {scholarship.status}
-                    </Badge>
+                  <div className="flex flex-col items-start md:items-end">
+                    <div className="mb-2">
+                      <Badge className={`top-4 right-4 z-10 ${buttonColors[scholarship.status as keyof typeof buttonColors] || buttonColors["Draft"]}`}>
+                        {scholarship.status}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <IoCalendarClear className="w-4 h-4" />
+                      <span> {scholarship.deadline} </span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <IoCalendarClear className="w-4 h-4" />
-                    <span> {scholarship.deadline} </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
             </Link>
           ))}
         </div>

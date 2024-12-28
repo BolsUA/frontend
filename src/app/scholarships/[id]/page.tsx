@@ -7,11 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Calendar, Users, FileText, User } from "lucide-react"
-import { describe } from 'node:test'
-import { description } from '@/components/app-sidebar'
 import Link from 'next/link'
 import { MdOutlineSchool } from "react-icons/md";
-import { verify } from 'crypto'
 
 interface Scholarship {
   id: string
@@ -64,15 +61,11 @@ const areaColors = {
 // This would typically come from your API or database
 async function getScholarship(id: string) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/${id}/details` , {cache: "no-cache"}); 
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const scholarship = await response.json();
-    console.log('Scholarship:', scholarship);
-    return scholarship;
-  } catch (error) {
-    console.error('Error fetching scholarship:', error);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/${id}/details`)
+      .then(res => res.json())
+      .catch(() => null);
+    return response;
+  } catch {
     return null;
   }
 }
@@ -81,12 +74,9 @@ async function getScholarship(id: string) {
 export default async function ScholarshipDetails({ params }: { params: { id: string } }) {
   const scholarship = await getScholarship(params.id)
 
-
   if (!scholarship) {
     notFound()
   }
-
-  // console.log('Scholarship:', scholarship); // Log the scholarship object to inspect its structure
 
   return (
     <div className="container mx-auto py-10">

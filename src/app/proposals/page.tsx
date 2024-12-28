@@ -1,9 +1,12 @@
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { auth } from '../../auth';
+import { redirect } from "next/navigation";
 
 interface Proposal {
+  id: string;
   name: string;
   type: string;
   deadline: string;
@@ -18,70 +21,35 @@ const buttonColors = {
   "Closed": "bg-red-500/50 text-secondary-foreground hover:bg-secondary/80",
 };
 
-const Proposals: Proposal[] = [
-  // {
-  //   name: "STEM Excellence Scholarship",
-  //   type: "Full Tuition",
-  //   deadline: "1 day left",
-  //   status: "Draft",
-  // },
-  // {
-  //   name: "Global Health Research Grant",
-  //   type: "Research Grant",
-  //   deadline: "14-08-2024",
-  //   status: "Under Review",
-  // },
-  // {
-  //   name: "Environmental Studies Fellowship",
-  //   type: "Fellowship",
-  //   deadline: "1 week left",
-  //   status: "Open",
-  // },
-  // {
-  //   name: "Arts and Humanities Scholarship",
-  //   type: "Partial Tuition",
-  //   deadline: "2 months left",
-  //   status: "Jury Evaluation",
-  // },
-  // {
-  //   name: "Social Sciences Research Award",
-  //   type: "Research Award",
-  //   deadline: "01-10-2024",
-  //   status: "Closed",
-  // },
-  // {
-  //   name: "Innovative Technology Grant",
-  //   type: "Research Grant",
-  //   deadline: "15-09-2023",
-  //   status: "Open",
-  // },
-  // {
-  //   name: "Creative Arts Fellowship",
-  //   type: "Fellowship",
-  //   deadline: "30-11-2023",
-  //   status: "Under Review",
-  // },
-  // {
-  //   name: "Environmental Protection Scholarship",
-  //   type: "Partial Tuition",
-  //   deadline: "20-12-2023",
-  //   status: "Draft",
-  // },
-  // {
-  //   name: "Medical Research Award",
-  //   type: "Research Award",
-  //   deadline: "05-01-2024",
-  //   status: "Jury Evaluation",
-  // },
-  // {
-  //   name: "Global Education Scholarship",
-  //   type: "Full Tuition",
-  //   deadline: "10-02-2024",
-  //   status: "Closed",
-  // },
-];
+async function getProposals(userId: string): Promise<Proposal[] | null> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships?publisher=${userId}`)
+      .then(res => res.json())
+      .catch(() => null);
+
+    if (!response) return null;
+
+    const proposals = response?.map((proposal: Proposal) => ({
+      id: proposal.id,
+      name: proposal.name,
+      type: proposal.type,
+      deadline: proposal.deadline,
+      status: proposal.status,
+    }));
+
+    return proposals;
+  } catch {
+    return null;
+  }
+}
 
 export default async function ProposalsPage() {
+  const session = await auth();
+  if (!session || !session.user || !session.user?.id) return redirect('/');
+
+  const proposals = await getProposals(session.user.id);
+  if (!proposals) return redirect('/');
+
   return (
     <div className="container mx-auto p-4">
       <div className='flex justify-between items-center mb-6'>
@@ -91,7 +59,6 @@ export default async function ProposalsPage() {
         </Button>
       </div>
       <Table>
-        <TableCaption>A list of your scholarships proposals.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">Name</TableHead>
@@ -102,7 +69,7 @@ export default async function ProposalsPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {Proposals.map((proposal, index) => (
+          {proposals.map((proposal, index) => (
             <TableRow key={index}>
               <TableCell className="font-medium">{proposal.name}</TableCell>
               <TableCell>
@@ -113,7 +80,9 @@ export default async function ProposalsPage() {
               <TableCell>{proposal.type}</TableCell>
               <TableCell>{proposal.deadline}</TableCell>
               <TableCell className="text-right">
-                <Button variant="secondary" className="text-right bg-blue-800  hover:bg-secondary/80">More details</Button>
+                <Button variant="secondary" className="text-right bg-blue-800  hover:bg-secondary/80">
+                  <Link href={`/scholarships/${proposal.id}`}>More details</Link>
+                </Button>
               </TableCell>
             </TableRow>
           ))}

@@ -134,8 +134,6 @@ export default function Page({
   const { data: session, status } = useSession()
   const pathname = usePathname()
 
-  if (session) console.log(session.user)
-
   const getCurrentThemeIcon = () => {
     if (theme === "light") return <Sun className="size-4 mr-2" />
     if (theme === "dark") return <Moon className="size-4 mr-2" />

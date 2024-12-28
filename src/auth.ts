@@ -9,6 +9,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 token.email = user.email
                 token.name = profile.name
                 token.groups = profile['cognito:groups'] as string[];
+                token.sub = profile.sub as string
             }
 
             return token;
@@ -19,6 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 session.user.email = token.email as string;
                 // @ts-expect-error groups is not defined in the default user type
                 session.user.groups = token.groups as string[];
+                session.user.id = token.sub as string;
             }
             return session;
         }

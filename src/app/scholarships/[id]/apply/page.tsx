@@ -80,10 +80,18 @@ export default function ApplyForScholarship({ params: { id } }: { params: { id: 
       });
 
       try {
-        const response = await fetch('http://localhost:8001/applications', {
+        const response = await fetch('http://localhost:8002/applications', {
           method: 'POST',
           body: formDataToSubmit,
+          headers: {
+            'Content-Type': 'application/json',
+            // @ts-expect-error Access token is defined
+            'Authorization': `Bearer ${session?.accessToken}`
+          }
         });
+
+        console.log(formDataToSubmit);
+        console.log(response);
 
         if (response.ok) {
           setIsSubmitted(true);

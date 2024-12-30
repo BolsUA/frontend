@@ -70,7 +70,7 @@ async function getScholarship(userId: string,accessToken: string): Promise<Schol
       }
     );
     
-    console.log(response);
+    //console.log(response);
     if (!response.ok) {
       console.error("API request failed:", response.status);
       return null;

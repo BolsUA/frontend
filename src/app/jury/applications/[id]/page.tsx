@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button"
 import { FileText } from "lucide-react"
 import Link from 'next/link'
 import { auth } from '@/auth';
+import GradeApplicationDialog from "@/components/gradingDialog"
 
 interface Application {
     id: string
+    scholarship_id: string
     user_id: string
     name: string
     documents: { name: string, file_path: string, }[]
@@ -31,8 +33,11 @@ async function getApplications(scholarshipId: string, accessToken: string): Prom
         }
 
         const data = await response.json();
+
+        console.log(data);
         return data?.map((proposal: Application) => ({
             id: proposal.id,
+            scholarship_id: proposal.scholarship_id,
             user_id: proposal.user_id,
             name: proposal.name,
             documents: proposal.documents
@@ -43,7 +48,7 @@ async function getApplications(scholarshipId: string, accessToken: string): Prom
     }
 }
 
-export default async function ScholarshipsPage({params}: {params: { id: string }}) {
+export default async function ScholarshipsPage({ params }: { params: { id: string } }) {
     const session = await auth();
 
     if (!session?.user?.id) {
@@ -73,34 +78,32 @@ export default async function ScholarshipsPage({params}: {params: { id: string }
                                     <h2 className="text-xl font-semibold mb-2">{application.name}</h2>
                                 </div>
                                 <div className="flex space-x-2">
-                                {application.documents.map((documents) => (
-                                <li 
-                                    key={documents.name} 
-                                    className="flex flex-col space-y-2 mb-4 p-2 border rounded-lg"
-                                >
-                                    <div className="flex items-center">
-                                    <FileText className="mr-2 h-4 w-4" />
-                                    {documents.name}
-                                    </div>
-                                    {documents.file_path && (
-                                    <Link 
-                                        href={`${process.env.NEXT_PUBLIC_API_URL}/scholarships/${documents.file_path}`} 
-                                        target="_blank"
-                                    >
-                                        <Button 
-                                        variant="outline" 
-                                        className="w-full mt-2" 
-                                        size="sm"
+                                    {application.documents.map((documents) => (
+                                        <li
+                                            key={documents.name}
+                                            className="flex flex-col space-y-2 mb-4 p-2 border rounded-lg"
                                         >
-                                        Download Document
-                                        </Button>
-                                    </Link>
-                                    )}
-                                </li>
-                                ))}
-                                <Button variant="outline" className="h-9 bg-blue-600">
-                                    Grade
-                                </Button>
+                                            <div className="flex items-center">
+                                                <FileText className="mr-2 h-4 w-4" />
+                                                {documents.name}
+                                            </div>
+                                            {documents.file_path && (
+                                                <Link
+                                                    href={`http://localhost:8002/${documents.file_path}`}
+                                                    target="_blank"
+                                                >
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full mt-2"
+                                                        size="sm"
+                                                    >
+                                                        Download Document
+                                                    </Button>
+                                                </Link>
+                                            )}
+                                        </li>
+                                    ))}
+                                    <GradeApplicationDialog application={application} session={session} />
                                 </div>
                             </CardContent>
                         </Card>
@@ -109,54 +112,4 @@ export default async function ScholarshipsPage({params}: {params: { id: string }
             </ScrollArea>
         </div>
     )
-
-    // versão vertical não sei qual fica pior XD
-    // return (
-    //     <div className="container mx-auto p-4">
-    //         <h1 className="text-2xl font-bold mb-6">All Applications</h1>
-    //         <ScrollArea className="h-[calc(100vh-16rem)]">
-    //             <div className="space-y-4">
-    //                 {applications.map((application) => (
-    //                     <Card key={application.id} className="hover:shadow-lg hover:bg-gray-600 transition-shadow duration-300">
-    //                         <CardContent className="flex flex-col md:flex-row justify-between items-start md:items-center p-6">
-    //                             <div className="flex-grow mb-4 md:mb-0 md:mr-4">
-    //                                 <h2 className="text-xl font-semibold mb-2">{application.name}</h2>
-    //                             </div>
-    //                             <div className="flex flex-col space-y-2">
-    //                             {application.documents.map((documents) => (
-    //                             <li 
-    //                                 key={documents.name} 
-    //                                 className="flex flex-col space-y-2 w-full p-2 border rounded-lg"
-    //                             >
-    //                                 <div className="flex items-center w-full">
-    //                                 <FileText className="mr-2 h-4 w-4" />
-    //                                 {documents.name}
-    //                                 </div>
-    //                                 {documents.file_path && (
-    //                                 <Link 
-    //                                     href={`${process.env.NEXT_PUBLIC_API_URL}/scholarships/${documents.file_path}`} 
-    //                                     target="_blank"
-    //                                 >
-    //                                     <Button 
-    //                                     variant="outline" 
-    //                                     className="w-full mt-2" 
-    //                                     size="sm"
-    //                                     >
-    //                                     Download Document
-    //                                     </Button>
-    //                                 </Link>
-    //                                 )}
-    //                             </li>
-    //                             ))}
-    //                             <Button variant="outline" className="h-9 bg-blue-600">
-    //                                 Grade
-    //                             </Button>
-    //                             </div>
-    //                         </CardContent>
-    //                     </Card>
-    //                 ))}
-    //             </div>
-    //         </ScrollArea>
-    //     </div>
-    // )
 }

@@ -101,7 +101,6 @@ const areas = [
 
 export default function ScholarshipProposalForm() {
     const [jury, setJury] = useState<{ value: string, label: string }[]>([]);
-
     const [selectedType, setSelectedType] = useState<string>('');
     const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
     const [selectedJury, setSelectedJury] = useState<string[]>([]);

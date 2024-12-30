@@ -34,7 +34,6 @@ async function getApplications(scholarshipId: string, accessToken: string): Prom
 
         const data = await response.json();
 
-        console.log(data);
         return data?.map((proposal: Application) => ({
             id: proposal.id,
             scholarship_id: proposal.scholarship_id,
@@ -47,6 +46,28 @@ async function getApplications(scholarshipId: string, accessToken: string): Prom
         return null;
     }
 }
+
+async function getCurrentResults(scholarshipId: string, accessToken: string): Promise<Application[] | null> {
+    try {
+        const response = await fetch(`http://localhost:8003/grading/grades?scholarship_id=${scholarshipId}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        if (!response.ok) {
+            console.error("API request failed:", response.status);
+            return null;
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Failed to fetch scholarships:', error);
+        return null;
+    }
+}
+
 
 export default async function ScholarshipsPage({ params }: { params: { id: string } }) {
     const session = await auth();
@@ -65,6 +86,9 @@ export default async function ScholarshipsPage({ params }: { params: { id: strin
     if (!applications || applications.length === 0) {
         return <div className="p-4">No applications found</div>;
     }
+
+    // @ts-expect-error Session does not have accessToken
+    const results = await getCurrentResults(params.id, session.accessToken);
 
     return (
         <div className="container mx-auto p-4">
@@ -103,7 +127,7 @@ export default async function ScholarshipsPage({ params }: { params: { id: strin
                                             )}
                                         </li>
                                     ))}
-                                    <GradeApplicationDialog application={application} session={session} />
+                                    <GradeApplicationDialog application={application} session={session} results={results} />
                                 </div>
                             </CardContent>
                         </Card>

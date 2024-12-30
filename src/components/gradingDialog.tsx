@@ -25,7 +25,13 @@ import { Label } from "@/components/ui/label";
 import { Check, X, Clock } from "lucide-react";
 import { useState } from 'react';
 
-const GradeApplicationDialog = ({ session, application, results }) => {
+const GradeApplicationDialog = ({
+	session,
+	application,
+	results,
+	refreshResults,
+	path
+}) => {
 	const [showMainDialog, setShowMainDialog] = useState(false);
 	const [showRejectDialog, setShowRejectDialog] = useState(false);
 	const [showGradeDialog, setShowGradeDialog] = useState(false);
@@ -97,7 +103,7 @@ const GradeApplicationDialog = ({ session, application, results }) => {
 			setShowRejectDialog(false);
 			setShowMainDialog(false);
 			setRejectReason('');
-			// You might want to trigger a refresh of the results here
+			await refreshResults(path);
 		} catch (error) {
 			console.error('Failed to reject application:', error);
 		}
@@ -132,7 +138,7 @@ const GradeApplicationDialog = ({ session, application, results }) => {
 			setShowGradeDialog(false);
 			setShowMainDialog(false);
 			setGrade('');
-			// You might want to trigger a refresh of the results here
+			await refreshResults(path);
 		} catch (error) {
 			console.error('Failed to grade application:', error);
 		}

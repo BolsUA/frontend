@@ -5,6 +5,7 @@ import { FileText } from "lucide-react"
 import Link from 'next/link'
 import { auth } from '@/auth';
 import GradeApplicationDialog from "@/components/gradingDialog"
+import { revalidatePath } from 'next/cache';
 
 interface Application {
     id: string
@@ -68,6 +69,10 @@ async function getCurrentResults(scholarshipId: string, accessToken: string): Pr
     }
 }
 
+async function refreshResults(path: string) {
+    'use server'
+    revalidatePath(path)
+}
 
 export default async function ScholarshipsPage({ params }: { params: { id: string } }) {
     const session = await auth();
@@ -127,7 +132,13 @@ export default async function ScholarshipsPage({ params }: { params: { id: strin
                                             )}
                                         </li>
                                     ))}
-                                    <GradeApplicationDialog application={application} session={session} results={results} />
+                                    <GradeApplicationDialog
+                                        session={session}
+                                        application={application}
+                                        results={results}
+                                        refreshResults={refreshResults}
+                                        path={`/jury/applications/${params.id}`}
+                                    />
                                 </div>
                             </CardContent>
                         </Card>

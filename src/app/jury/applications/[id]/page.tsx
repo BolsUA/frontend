@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { auth } from '@/auth';
 import GradeApplicationDialog from "@/components/gradingDialog"
 import { revalidatePath } from 'next/cache';
+import SubmitResultsButton from "@/components/submitResultsButton"
 
 interface Application {
     id: string
@@ -13,6 +14,10 @@ interface Application {
     user_id: string
     name: string
     documents: { name: string, file_path: string, }[]
+}
+
+interface Scholarship {
+    jury: number
 }
 
 async function getApplications(scholarshipId: string, accessToken: string): Promise<Application[] | null> {
@@ -47,6 +52,32 @@ async function getApplications(scholarshipId: string, accessToken: string): Prom
         return null;
     }
 }
+
+async function getScholarshipDetails(id: string, accessToken: string): Promise<Scholarship[] | null> {
+    try {
+      
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/scholarships/${id}/details`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        }
+      );
+      
+      //console.log(response);
+      if (!response.ok) {
+        console.error("API request failed:", response.status);
+        return null;
+      }
+  
+      const data = await response.json();
+      return data ? data.jury.length : null;
+    } catch (error) {
+      console.error('Failed to fetch scholarships:', error);
+      return null;
+    }
+  }
 
 async function getCurrentResults(scholarshipId: string, accessToken: string): Promise<Application[] | null> {
     try {
@@ -94,7 +125,8 @@ export default async function ScholarshipsPage({ params }: { params: { id: strin
 
     // @ts-expect-error Session does not have accessToken
     const results = await getCurrentResults(params.id, session.accessToken);
-
+    // @ts-expect-error Session does not have accessToken
+    const juryamount = await getScholarshipDetails(params.id, session.accessToken);
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-6">All Applications</h1>
@@ -145,6 +177,14 @@ export default async function ScholarshipsPage({ params }: { params: { id: strin
                     ))}
                 </div>
             </ScrollArea>
+            <SubmitResultsButton
+                applications={applications}
+                results={results}
+                scholarshipId={params.id}
+                juryamount={juryamount}
+                // @ts-expect-error Session does not have accessToken
+                accessToken={session.accessToken}
+            />
         </div>
     )
 }

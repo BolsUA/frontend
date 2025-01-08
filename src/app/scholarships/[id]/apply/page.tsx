@@ -80,7 +80,7 @@ export default function ApplyForScholarship({ params: { id } }: { params: { id: 
       });
 
       try {
-        const response = await fetch('http://localhost:8002/applications/', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/applications/`, {
           method: 'POST',
           body: formDataToSubmit,
           headers: {

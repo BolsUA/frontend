@@ -45,7 +45,7 @@ async function getApplications(scholarship_id: string, accessToken: string): Pro
             scholarship_id: application.scholarship_id,
             user_id: application.user_id,
             name: application.name,
-            documents: application.documents
+            // documents: application.documents
         }));
     } catch (error) {
         console.error('Failed to fetch scholarships:', error);
@@ -111,7 +111,7 @@ export default async function ScholarshipsPage({ params }: { params: { id: strin
                                     <h2 className="text-xl font-semibold mb-2">{application.name}</h2>
                                 </div>
                                 <div className="flex space-x-2">
-                                    {application.documents.map((documents) => (
+                                    {/* {application.documents.map((documents) => (
                                         <li
                                             key={documents.name}
                                             className="flex flex-col space-y-2 mb-4 p-2 border rounded-lg"
@@ -135,7 +135,7 @@ export default async function ScholarshipsPage({ params }: { params: { id: strin
                                                 </Link>
                                             )}
                                         </li>
-                                    ))}
+                                    ))} */}
                                     <GradeApplicationDialog
                                         session={session}
                                         application={application}

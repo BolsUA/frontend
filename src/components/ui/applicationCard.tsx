@@ -29,8 +29,7 @@ export function ScholarshipCard({ application, session }: { application: Scholar
     setUserResponse(response);
 
     try {
-      const apiResponse = await fetch(`http://localhost:8003/grading/${application.id}/response?user_response=${response}`, {
-      // const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/grading/${application.id}/response?user_response=${response}`, {
+      const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/grading/${application.id}/response?user_response=${response}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

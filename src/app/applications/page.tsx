@@ -32,8 +32,7 @@ export default async function ScholarshipsPage() {
 async function fetchScholarships(session: Session): Promise<ScholarshipApplication[]> {
     try {
         const user_id = session.user?.id;
-        const response = await fetch(`http://localhost:8002/applications/?user_id=${user_id}&skip=0&limit=100`, {
-        // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/applications/?user_id=${user_id}&skip=0&limit=100`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/applications/?user_id=${user_id}&skip=0&limit=100`, {
             method: 'GET',
             // cache: 'no-cache',
             headers: {

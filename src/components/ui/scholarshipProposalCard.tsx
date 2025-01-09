@@ -12,7 +12,6 @@ export function ScholarshipCard({ proposal, session }: { proposal: ScholarshipPr
 
   const handleUserResponse = async (accepted: boolean) => {
     try {
-      // const response = await fetch(`http://localhost:8001/scholarships/secretary/status?scholarship_id=${proposal.id}&accepted=${accepted}`, {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/secretary/status?scholarship_id=${proposal.id}&accepted=${accepted}`, {
         method: 'PUT',
         headers: {

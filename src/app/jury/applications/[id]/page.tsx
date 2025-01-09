@@ -24,7 +24,7 @@ async function getApplications(scholarship_id: string, accessToken: string): Pro
     try {
 
         const response = await fetch(
-            `http://localhost:8003/grading/applications/${scholarship_id}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/grading/applications/${scholarship_id}`,
             {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
@@ -55,7 +55,7 @@ async function getApplications(scholarship_id: string, accessToken: string): Pro
 
 async function getCurrentResults(scholarshipId: string, accessToken: string): Promise<Application[] | null> {
     try {
-        const response = await fetch(`http://localhost:8003/grading/grades?scholarship_id=${scholarshipId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/grading/grades?scholarship_id=${scholarshipId}`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             }
@@ -122,7 +122,7 @@ export default async function ScholarshipsPage({ params }: { params: { id: strin
                                             </div>
                                             {documents.file_path && (
                                                 <Link
-                                                    href={`http://localhost:8002/${documents.file_path}`}
+                                                    href={`${process.env.NEXT_PUBLIC_API_URL}/${documents.file_path}`}
                                                     target="_blank"
                                                 >
                                                     <Button

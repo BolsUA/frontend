@@ -35,7 +35,7 @@ const SubmitResultsButton = ({
   const handleSubmit = async () => {
     try {
       console.log("Starting submission...");
-      const response = await fetch('http://localhost:8003/grading/submit', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/grading/submit`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,

@@ -82,7 +82,7 @@ const GradeApplicationDialog = ({
 		}
 
 		try {
-			const response = await fetch('http://localhost:8003/grading/grade', {
+			const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/grading/grade`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ const GradeApplicationDialog = ({
 		}
 
 		try {
-			const response = await fetch('http://localhost:8003/grading/grade', {
+			const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/grading/grade`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

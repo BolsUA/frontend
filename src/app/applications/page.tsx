@@ -8,6 +8,7 @@ export default async function ScholarshipsPage() {
     const session = await auth();
     if (!session || !session.user || !session.user?.id) return redirect('/');
 
+    console.log(session?.accessToken);
     const applications = await fetchScholarships(session);
 
     return (
@@ -32,8 +33,9 @@ async function fetchScholarships(session: Session): Promise<ScholarshipApplicati
     try {
         const user_id = session.user?.id;
         const response = await fetch(`http://localhost:8002/applications/?user_id=${user_id}&skip=0&limit=100`, {
+        // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/applications/?user_id=${user_id}&skip=0&limit=100`, {
             method: 'GET',
-            cache: 'no-cache',
+            // cache: 'no-cache',
             headers: {
                 // @ts-expect-error Access token is defined
                 'Authorization': `Bearer ${session?.accessToken}`

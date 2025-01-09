@@ -6,6 +6,7 @@ export interface ScholarshipApplication {
   status: ApplicationStatus;
   grade?: number;
   userResponse?: 'Accepted' | 'Declined';
+  selected: boolean;
 }
 
 export type ApiResponse = {
@@ -18,6 +19,7 @@ export type ApiResponse = {
   documents: { name: string; file_path: string }[];
   user_response: string | null;
   grade: number | null;
+  selected: boolean;
 };
 
 export const transformApiResponse = (response: ApiResponse): ScholarshipApplication => {
@@ -27,5 +29,6 @@ export const transformApiResponse = (response: ApiResponse): ScholarshipApplicat
     status: response.status as ScholarshipApplication["status"], // Type assertion
     grade: (response.status === "Approved" || response.status === "Reject") && "grade" in response ? (response as any).grade : undefined,
     userResponse: response.user_response === null ? undefined : response.user_response as 'Accepted' | 'Declined',
+    selected: response.selected,
   };
 };

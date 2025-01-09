@@ -29,7 +29,8 @@ export function ScholarshipCard({ application, session }: { application: Scholar
     setUserResponse(response);
 
     try {
-      const apiResponse = await fetch(`http://localhost:8002/applications/${application.id}/response?user_response=${response}`, {
+      const apiResponse = await fetch(`http://localhost:8003/grading/${application.id}/response?user_response=${response}`, {
+      // const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/grading/${application.id}/response?user_response=${response}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +61,7 @@ export function ScholarshipCard({ application, session }: { application: Scholar
           <Badge className={`${getStatusColor(application.status)} text-white`}>
             {application.status}
           </Badge>
-          {application.status === 'Approved' && !userResponse && (
+          {application.selected && application.status === 'Approved' && !userResponse && (
             <div className="flex space-x-2">
               <Button onClick={() => handleResponse('Accepted')} variant="default" size="sm">Accept</Button>
               <Button onClick={() => handleResponse('Declined')} variant="outline" size="sm">Decline</Button>

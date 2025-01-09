@@ -159,7 +159,7 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
                       {documents.name}
                     </div>
                     {documents.file_path && (
-                        <Link href={`${process.env.NEXT_PUBLIC_API_URL}/scholarships/${documents.file_path}`} target="_blank">
+                        <Link href={documents.file_path} target="_blank">
                           <Button variant="outline" size="sm">Download Template</Button>
                         </Link>
                     )}
@@ -169,6 +169,19 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
             </div>
 
             <Separator />
+
+            <div>
+              {/* Edict is a file like the documents, but is mandatory */}
+              <h3 className="font-semibold mb-2">Edict</h3>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <FileText className="mr-2 h-4 w-4" />
+                  {scholarship.edict.name}
+                </div>
+                <Link href={scholarship.edict.file_path} target="_blank">
+                  <Button variant="outline" size="sm">Download Edict</Button>
+                </Link>
+            </div>
 
             <div className="flex justify-end">
               <Link href={`/scholarships/${scholarship.id}/apply`}><Button>Apply for Scholarship</Button></Link>

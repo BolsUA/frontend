@@ -72,7 +72,6 @@ export default function ApplyForScholarship({ params: { id } }: { params: { id: 
       formDataToSubmit.append('scholarship_id', scholarship?.id || '');
       formDataToSubmit.append('name', scholarship?.name || '');
       formDataToSubmit.append('user_id', session?.user?.id || '');
-
       Object.keys(formData.documents).forEach((key) => {
         if (formData.documents[key]) {
           formDataToSubmit.append('document_file', formData.documents[key] as File);
@@ -80,10 +79,11 @@ export default function ApplyForScholarship({ params: { id } }: { params: { id: 
       });
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/applications/`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/applications/submit`, {
           method: 'POST',
           body: formDataToSubmit,
           headers: {
+            'Accept': 'application/json',
             // @ts-expect-error Access token is defined
             'Authorization': `Bearer ${session?.accessToken}`
           }

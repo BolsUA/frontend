@@ -145,7 +145,7 @@ export default function ApplyForScholarship({ params: { id } }: { params: { id: 
                     className={`file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 ${errors[doc.name] ? 'border-red-500' : ''}`}
                   />
                   {doc.template && (
-                    <Button type="button" variant="outline" size="sm" onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/${doc.file_path}`, '_blank')}>
+                    <Button type="button" variant="outline" size="sm" onClick={() => window.open(doc.file_path, '_blank')}>
                       <Upload className="mr-2 h-4 w-4" /> Template
                     </Button>
                   )}

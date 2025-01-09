@@ -18,7 +18,6 @@ const SubmitResultsButton = ({
   applications, 
   results, 
   scholarshipId, 
-  juryamount,
   accessToken 
 }) => {
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
@@ -45,7 +44,6 @@ const SubmitResultsButton = ({
         body: JSON.stringify({
           scholarship_id: scholarshipId,
           results: results,
-          juryamount: juryamount,
         }),
       });
 

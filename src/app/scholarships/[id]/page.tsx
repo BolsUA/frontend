@@ -20,7 +20,7 @@ interface Scholarship {
   deadline: string
   status: "Draft" | "Under Review" | "Open" | "Jury Evaluation" | "Closed"
   scientific_areas: { name: string, id: string }[]
-  documents: { name: string, file_path:string, hasTemplate: boolean, required: boolean , template: boolean }[]
+  documents: { name: string, file_path: string, hasTemplate: boolean, required: boolean, template: boolean }[]
   edict: { name: string, description: string, publication_date: string, id: string }
 }
 
@@ -86,10 +86,10 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
             <div>
               <CardTitle className="text-2xl font-bold">{scholarship.name}</CardTitle>
             </div>
-            
+
             <Badge variant={scholarship.status === 'Open' ? 'default' : 'secondary'}>
-                {scholarship.status}
-              </Badge>
+              {scholarship.status}
+            </Badge>
           </div>
         </CardHeader>
         <CardContent>
@@ -126,23 +126,23 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
                 <Calendar className="mr-2 h-4 w-4" />
                 <span>Application deadline: {scholarship.deadline}</span>
               </div>
-              <div className="flex items-center">            
-                <MdOutlineSchool className="mr-2 h-4 w-4"/>
+              <div className="flex items-center">
+                <MdOutlineSchool className="mr-2 h-4 w-4" />
                 <span>{scholarship.type} scholarship</span>
               </div>
             </div>
 
             <Separator />
 
-             <div> 
+            <div>
               <h3 className="font-semibold mb-2">Selected Jury</h3>
               <ul className="list-disc list-inside">
-                  <li className="flex items-center">
-                    <User className="mr-2 h-4 w-4" />
-                    {scholarship.jury.map((jury) => (
-                      <span key={jury.id}>{jury.name}</span>
-                    ))}
-                  </li>
+                <li className="flex items-center">
+                  <User className="mr-2 h-4 w-4" />
+                  {scholarship.jury.map((jury) => (
+                    <span key={jury.id}>{jury.name}</span>
+                  ))}
+                </li>
               </ul>
             </div>
 
@@ -151,7 +151,7 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
             <div>
               <h3 className="font-semibold mb-2">Required Documents</h3>
               <ul className="space-y-2">
-              {scholarship.documents.length === 0 ? <p className="text-muted-foreground mt-2">No documents required</p> : null}
+                {scholarship.documents.length === 0 ? <p className="text-muted-foreground mt-2">No documents required</p> : null}
                 {scholarship.documents.map((documents) => (
                   <li key={documents.name} className="flex items-center justify-between">
                     <div className="flex items-center">
@@ -159,9 +159,9 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
                       {documents.name}
                     </div>
                     {documents.file_path && (
-                        <Link href={documents.file_path} target="_blank">
-                          <Button variant="outline" size="sm">Download Template</Button>
-                        </Link>
+                      <Link href={documents.file_path} target="_blank">
+                        <Button variant="outline" size="sm">Download Template</Button>
+                      </Link>
                     )}
                   </li>
                 ))}
@@ -181,6 +181,7 @@ export default async function ScholarshipDetails({ params }: { params: { id: str
                 <Link href={scholarship.edict.file_path} target="_blank">
                   <Button variant="outline" size="sm">Download Edict</Button>
                 </Link>
+              </div>
             </div>
 
             <div className="flex justify-end">

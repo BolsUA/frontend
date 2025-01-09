@@ -115,7 +115,7 @@ export default function ScholarshipProposalForm() {
 
     useEffect(() => {
         const getJuryMembers = async () => {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/people/jury-members/`,
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/jury-members/`,
                 {
                     headers: {
                         'Content-Type': 'application/json',

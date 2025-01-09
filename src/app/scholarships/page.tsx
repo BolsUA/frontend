@@ -118,7 +118,7 @@ export default function ScholarshipsPage() {
       }
 
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships/?${queryParams.toString()}`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/scholarships?${queryParams.toString()}`)
         .then((res) => res.json())
         .catch(() => []);
 

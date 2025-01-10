@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { ScholarshipApplication } from "@/types/application"
 import { Session } from 'next-auth'
 
-export function ScholarshipCard({ application, session }: { application: ScholarshipApplication; session: Session; }) {
+export function ScholarshipCard({ application, accessToken }: { application: ScholarshipApplication; accessToken: Session; }) {
   const [userResponse, setUserResponse] = useState<'Accepted' | 'Declined' | undefined>(application.userResponse)
 
   const getStatusColor = (status: string) => {
@@ -33,7 +33,7 @@ export function ScholarshipCard({ application, session }: { application: Scholar
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.accessToken}`
+          'Authorization': `Bearer ${accessToken?.accessToken}`
         },
       });
 
@@ -60,7 +60,7 @@ export function ScholarshipCard({ application, session }: { application: Scholar
           <Badge className={`${getStatusColor(application.status)} text-white`}>
             {application.status}
           </Badge>
-          {application.selected && application.status === 'Approved' && !userResponse && (
+          {application.select && application.status === 'Approved' && !userResponse && (
             <div className="flex space-x-2">
               <Button onClick={() => handleResponse('Accepted')} variant="default" size="sm">Accept</Button>
               <Button onClick={() => handleResponse('Declined')} variant="outline" size="sm">Decline</Button>
